@@ -24,3 +24,5 @@ __pycache__/
 
 # Raw datasets
 data/raw/*
+# Processed datasets
+data/processed/*
