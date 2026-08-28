@@ -26,3 +26,6 @@ __pycache__/
 data/raw/*
 # Processed datasets
 data/processed/*
+
+# Generated integrated datasets
+data/integrated/
