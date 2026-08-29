@@ -24,8 +24,9 @@ __pycache__/
 
 # Raw datasets
 data/raw/*
+
 # Processed datasets
 data/processed/*
 
 # Generated integrated datasets
-data/integrated/
+data/integrated/*
