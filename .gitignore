@@ -30,3 +30,6 @@ data/processed/*
 
 # Generated integrated datasets
 data/integrated/*
+
+# Generated machine-learning-ready datasets
+data/model_ready/*
