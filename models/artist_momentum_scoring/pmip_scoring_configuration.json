@@ -1,0 +1,71 @@
+{
+    "configuration_version": "1.0.0",
+    "scoring_system": {
+        "name": "PMIP Artist Momentum Score",
+        "artifact_type": "Deterministic weighted scoring system",
+        "trained_machine_learning_model": false,
+        "score_minimum": 0.0,
+        "score_maximum": 100.0,
+        "neutral_reference": 50.0
+    },
+    "formula": {
+        "expression": "Final Momentum Score = 0.70 × Relative Daily Growth Component + 0.30 × Listener Peak Ratio Component",
+        "relative_daily_growth_weight": 0.7,
+        "listener_peak_ratio_weight": 0.3,
+        "weight_sum": 1.0,
+        "growth_to_peak_sensitivity_ratio": 2.3333333333333335
+    },
+    "ranking": {
+        "score_direction": "Higher scores indicate greater momentum",
+        "analytical_tie_method": "Average shared rank",
+        "displayed_secondary_order": "Artist ID for identical full-precision scores only",
+        "displayed_position_start": 1,
+        "displayed_score_decimal_places": 2,
+        "ranking_score": "Full-precision final momentum score"
+    },
+    "categories": [
+        {
+            "category": "Very Low Momentum",
+            "minimum_score": 0.0,
+            "maximum_score": 20.0,
+            "minimum_inclusive": true,
+            "maximum_inclusive": false
+        },
+        {
+            "category": "Low Momentum",
+            "minimum_score": 20.0,
+            "maximum_score": 40.0,
+            "minimum_inclusive": true,
+            "maximum_inclusive": false
+        },
+        {
+            "category": "Moderate Momentum",
+            "minimum_score": 40.0,
+            "maximum_score": 60.0,
+            "minimum_inclusive": true,
+            "maximum_inclusive": false
+        },
+        {
+            "category": "High Momentum",
+            "minimum_score": 60.0,
+            "maximum_score": 80.0,
+            "minimum_inclusive": true,
+            "maximum_inclusive": false
+        },
+        {
+            "category": "Very High Momentum",
+            "minimum_score": 80.0,
+            "maximum_score": 100.0,
+            "minimum_inclusive": true,
+            "maximum_inclusive": true
+        }
+    ],
+    "file_storage": {
+        "result_artifact_directory": "data/processed/artist_momentum_scoring",
+        "configuration_directory": "models/artist_momentum_scoring",
+        "result_file_format": "CSV",
+        "result_file_encoding": "UTF-8",
+        "saved_float_precision": "17 significant digits",
+        "configuration_file_format": "JSON"
+    }
+}

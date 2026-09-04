@@ -1,0 +1,75 @@
+{
+    "metadata_version": "1.0.0",
+    "project_name": "Predictive Music Intelligence Platform",
+    "analysis_name": "PMIP Artist Momentum Scoring",
+    "notebook": "07_artist_momentum_scoring.ipynb",
+    "artifact_creation": {
+        "created_at_utc": "2026-09-04T19:15:41+00:00",
+        "creation_time_meaning": "Time when the saved artifacts were created; this is not the source-data snapshot date."
+    },
+    "analytical_population": {
+        "eligible_artists": 1003,
+        "unique_artist_identifiers": 1003,
+        "population_scope": "The eligible artists included in the PMIP analytical dataset",
+        "wider_population_coverage": "Not assessable from the final dataset"
+    },
+    "score_summary": {
+        "minimum_score": 19.749422387262985,
+        "maximum_score": 100.0,
+        "mean_score": 60.77010515658076,
+        "median_score": 62.0133754598936,
+        "standard_deviation": 11.876538130657677,
+        "unique_exact_scores": 998,
+        "exact_score_tie_groups": 1,
+        "largest_exact_score_tie_group": 6
+    },
+    "category_composition": [
+        {
+            "category": "Very Low Momentum",
+            "artists": 1,
+            "percentage": 0.09970089730807577
+        },
+        {
+            "category": "Low Momentum",
+            "artists": 55,
+            "percentage": 5.483549351944168
+        },
+        {
+            "category": "Moderate Momentum",
+            "artists": 359,
+            "percentage": 35.7926221335992
+        },
+        {
+            "category": "High Momentum",
+            "artists": 548,
+            "percentage": 54.63609172482552
+        },
+        {
+            "category": "Very High Momentum",
+            "artists": 40,
+            "percentage": 3.988035892323031
+        }
+    ],
+    "temporal_context": {
+        "source_snapshot_date": null,
+        "measurement_window_start": null,
+        "measurement_window_end": null,
+        "historical_artist_observations": "Not available",
+        "availability_note": "The final table does not contain a source snapshot date, measurement-window boundaries or repeated historical artist observations."
+    },
+    "contextual_coverage": {
+        "subgroup_metadata": "Not available in the final table",
+        "source_platform_metadata": "Not available in the final table",
+        "eligibility_and_exclusion_details": "Not available in the final table"
+    },
+    "responsible_use": {
+        "supported_purpose": "Comparative description of current momentum among the eligible artists",
+        "conditional_purpose": "Professional prioritisation, future comparisons and subgroup comparisons with additional controls",
+        "unsupported_purpose": "Prediction, causal claims, complete artist valuation or sole automated consequential decisions",
+        "human_oversight_required": true
+    },
+    "validation_status": {
+        "section_12_1_passed": true,
+        "previous_analysis_validation": "All registered Sections 8 to 11 checks passed"
+    }
+}
