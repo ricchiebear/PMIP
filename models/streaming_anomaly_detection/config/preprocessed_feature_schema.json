@@ -1,0 +1,46 @@
+{
+    "feature_count": 26,
+    "feature_name_source": "reconstructed from model_feature_columns",
+    "ordered_features": [
+        "log1p_streams",
+        "signed_log1p_weekly_stream_change",
+        "log1p_absolute_weekly_stream_change",
+        "weekly_log2_stream_change",
+        "log1p_rolling_stream_cv_4w",
+        "log1p_rolling_stream_cv_8w",
+        "log1p_weekly_log_change_volatility_4w",
+        "log1p_weekly_log_change_volatility_8w",
+        "log1p_weekly_change_volatility_score_4w",
+        "log1p_weekly_change_volatility_score_8w",
+        "log1p_absolute_rolling_zscore_4w",
+        "log1p_absolute_rolling_zscore_8w",
+        "log1p_country_date_total_streams",
+        "log1p_country_date_other_mean_streams",
+        "log2_rolling_mean_4w_to_8w_ratio",
+        "log2_rolling_stream_cv_4w_to_8w_ratio",
+        "log2_weekly_change_volatility_4w_to_8w_ratio",
+        "log2_deviation_from_country_date_context",
+        "log2_deviation_from_track_date_context",
+        "country_date_stream_share",
+        "chart_position_percentile",
+        "track_date_country_share_percentile",
+        "log1p_country_date_other_mean_streams__missing",
+        "log2_deviation_from_country_date_context__missing",
+        "log2_deviation_from_track_date_context__missing",
+        "track_date_country_share_percentile__missing"
+    ],
+    "continuous_feature_count": 22,
+    "structural_missingness_indicator_count": 4,
+    "structural_missingness_features": [
+        "log1p_country_date_other_mean_streams",
+        "log2_deviation_from_country_date_context",
+        "log2_deviation_from_track_date_context",
+        "track_date_country_share_percentile"
+    ],
+    "structural_missingness_indicators": [
+        "log1p_country_date_other_mean_streams__missing",
+        "log2_deviation_from_country_date_context__missing",
+        "log2_deviation_from_track_date_context__missing",
+        "track_date_country_share_percentile__missing"
+    ]
+}

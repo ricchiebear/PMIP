@@ -1,0 +1,32 @@
+{
+    "artifact_stage": "PMIP streaming anomaly detection",
+    "section": "12.1",
+    "artifact_type": "validated anomaly-detection results",
+    "section_10_complete": true,
+    "section_11_complete": true,
+    "final_anomaly_score_rows": 2962652,
+    "final_anomaly_score_fields": 14,
+    "direction_severity_rows": 2962652,
+    "direction_severity_fields": 9,
+    "artist_explanation_rows": 18804,
+    "artist_explanation_fields": 30,
+    "final_pca_anomaly_count": 12592,
+    "selected_pca_threshold": 0.09517622303217674,
+    "selected_pca_components": 16,
+    "selected_threshold_percentile": 99.5,
+    "mandatory_result_files": {
+        "final_anomaly_scores": "final_anomaly_scores.csv",
+        "anomaly_direction_severity": "anomaly_direction_severity.csv",
+        "artist_level_explanations": "artist_level_explanations.csv"
+    },
+    "optional_result_files": {
+        "high_priority_anomaly_review_df": "high_priority_anomaly_review.csv",
+        "human_review_policy_df": "human_review_policy.csv",
+        "human_review_controls_df": "human_review_controls.csv",
+        "human_review_validation_df": "human_review_validation.csv"
+    },
+    "model_refitted": false,
+    "preprocessing_refitted": false,
+    "threshold_recalibrated": false,
+    "anomaly_labels_modified": false
+}

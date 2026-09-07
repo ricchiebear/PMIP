@@ -33,3 +33,7 @@ data/integrated/*
 
 # Generated machine-learning-ready datasets
 data/model_ready/*
+
+# PMIP streaming anomaly detection large generated results
+models/streaming_anomaly_detection/results/final_anomaly_scores.csv
+models/streaming_anomaly_detection/results/anomaly_direction_severity.csv

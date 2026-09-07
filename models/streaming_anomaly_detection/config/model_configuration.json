@@ -1,0 +1,17 @@
+{
+    "model_family": "PCA Reconstruction Error",
+    "selected_model_object_source": "selected_pca_model",
+    "selected_pca_components": 16,
+    "model_input_features": 26,
+    "explained_variance_ratio": 0.9884727756919327,
+    "threshold_source": "selected_pca_threshold",
+    "threshold_percentile_source": "selected_pca_threshold_percentile",
+    "threshold_percentile": 99.5,
+    "frozen_reconstruction_error_threshold": 0.09517622303217674,
+    "threshold_operator": ">=",
+    "threshold_recalibration_allowed": false,
+    "model_refitting_allowed": false,
+    "preprocessing_refitting_allowed": false,
+    "final_model_selection_status": "SELECTED WITH OPERATIONAL SAFEGUARDS",
+    "human_review_required": true
+}
