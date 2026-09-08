@@ -36,4 +36,11 @@ data/model_ready/*
 
 # PMIP streaming anomaly detection large generated results
 models/streaming_anomaly_detection/results/final_anomaly_scores.csv
+models/streaming_anomaly_detection/results/anomaly_direction_severity.csvmodels/geographic_intelligence/
+
+# PMIP streaming anomaly detection large generated results
+models/streaming_anomaly_detection/results/final_anomaly_scores.csv
 models/streaming_anomaly_detection/results/anomaly_direction_severity.csv
+
+# PMIP geographic intelligence generated artifacts
+models/geographic_intelligence/
