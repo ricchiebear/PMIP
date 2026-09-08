@@ -1,7 +1,0 @@
-Control,Permitted,Human Review Required,Control Position
-Automated causal interpretation,False,True,PCA anomaly output alone cannot establish a real-world cause.
-Automated enforcement decision,False,True,No anomaly may independently trigger enforcement or punitive action.
-Automated commercial decision,False,True,Commercial or artist-impacting decisions require authorised human judgement.
-High-priority anomaly escalation,True,True,PMIP may prioritise observations for review but cannot verify their cause.
-Severity-based prioritisation,True,True,Severity may determine review urgency but does not establish importance or causality.
-External causal claim,False,True,Independent contextual evidence is required before a causal explanation is accepted.

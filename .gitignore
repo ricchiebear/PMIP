@@ -34,13 +34,8 @@ data/integrated/*
 # Generated machine-learning-ready datasets
 data/model_ready/*
 
-# PMIP streaming anomaly detection large generated results
-models/streaming_anomaly_detection/results/final_anomaly_scores.csv
-models/streaming_anomaly_detection/results/anomaly_direction_severity.csvmodels/geographic_intelligence/
-
-# PMIP streaming anomaly detection large generated results
-models/streaming_anomaly_detection/results/final_anomaly_scores.csv
-models/streaming_anomaly_detection/results/anomaly_direction_severity.csv
-
-# PMIP geographic intelligence generated artifacts
+# PMIP generated model artifacts
+models/artist_momentum_scoring/
+models/forecasting/
+models/streaming_anomaly_detection/
 models/geographic_intelligence/

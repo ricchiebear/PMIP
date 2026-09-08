@@ -1,8 +1,0 @@
-Review Scenario,Review Requirement,Reviewer Role,Purpose,Automated Decision Allowed
-Any final PCA anomaly,Required,Analyst,Verify contextual plausibility before real-world interpretation.,No
-Near-threshold anomaly,Required,Analyst,Determine whether a marginal threshold exceedance is analytically meaningful.,No
-Structural contextual missingness,Enhanced,Analyst + data-quality review,Assess whether incomplete context may have influenced reconstruction error.,No
-Very High severity anomaly,High priority,Analyst,Investigate large training-relative deviation before operational use.,No
-Extreme anomaly,Mandatory,Senior analyst,Require senior assessment before any external or consequential interpretation.,No
-Proposed real-world causal explanation,Mandatory,Human analyst with external evidence,Validate causal interpretation using independent contextual evidence.,No
-"Commercial, enforcement or artist-impacting decision",Mandatory,Authorised human decision-maker,Prevent anomaly output from independently triggering consequential actions.,No
