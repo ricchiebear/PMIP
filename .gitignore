@@ -1,26 +1,53 @@
-# Virtual environment
+# ============================================================
+# Virtual environments
+# ============================================================
 .venv/
 venv/
 
+
+# ============================================================
 # Python
+# ============================================================
 __pycache__/
 *.py[cod]
 
-# Jupyter
+
+# ============================================================
+# Jupyter Notebook temporary files
+# ============================================================
 .ipynb_checkpoints/
 
+
+# ============================================================
 # macOS
+# ============================================================
 .DS_Store
 
+
+# ============================================================
 # VS Code
+# ============================================================
 .vscode/
 
+
+# ============================================================
 # Environment variables / API keys
+# ============================================================
 .env
 .env.*
 
+
+# ============================================================
 # Logs
+# ============================================================
 *.log
+
+
+# ============================================================
+# PMIP datasets
+# Generated datasets are recreated by the notebooks and should
+# not be stored directly in Git.
+# ============================================================
 
 # Raw datasets
 data/raw/*
@@ -28,14 +55,21 @@ data/raw/*
 # Processed datasets
 data/processed/*
 
-# Generated integrated datasets
+# Integrated datasets
 data/integrated/*
 
-# Generated machine-learning-ready datasets
+# Machine-learning-ready datasets
 data/model_ready/*
 
-# PMIP generated model artifacts
+
+# ============================================================
+# PMIP generated analytical/model artifacts
+# These directories contain generated CSVs, models, metadata,
+# validation outputs and other reproducible artifacts.
+# ============================================================
+
 models/artist_momentum_scoring/
 models/forecasting/
 models/streaming_anomaly_detection/
 models/geographic_intelligence/
+models/market_growth_intelligence/
