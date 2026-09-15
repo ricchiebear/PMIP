@@ -1,0 +1,376 @@
+@startuml
+title PMIP Database Entity Relationship Diagram
+
+hide circle
+skinparam linetype ortho
+skinparam entity {
+    BackgroundColor White
+    BorderColor Black
+}
+
+' ============================================================
+' CORE MUSIC ENTITIES
+' ============================================================
+
+entity "artists" as artists {
+    * artist_id : INT <<PK>>
+    --
+    artist_name
+}
+
+entity "tracks" as tracks {
+    * track_id : INT <<PK>>
+    --
+    source_track_id
+    isrc
+    track_name
+}
+
+entity "track_artists" as track_artists {
+    * track_id : INT <<PK, FK>>
+    * artist_id : INT <<PK, FK>>
+}
+
+entity "releases" as releases {
+    * release_id : INT <<PK>>
+    --
+    release_title
+    release_date
+    release_type
+}
+
+entity "release_tracks" as release_tracks {
+    * release_id : INT <<PK, FK>>
+    * track_id : INT <<PK, FK>>
+}
+
+entity "countries" as countries {
+    * country_id : INT <<PK>>
+    --
+    country_name
+    country_code
+}
+
+
+' ============================================================
+' HISTORICAL STREAMING DATA
+' ============================================================
+
+entity "streaming_observations" as streaming_observations {
+    * observation_id : BIGINT <<PK>>
+    --
+    track_id : INT <<FK>>
+    country_id : INT <<FK>>
+    observation_date
+    streams
+    chart_position
+}
+
+
+' ============================================================
+' INTELLIGENCE RUN TRACKING
+' ============================================================
+
+entity "intelligence_runs" as intelligence_runs {
+    * run_id : INT <<PK>>
+    --
+    component_name
+    component_version
+    generated_at
+}
+
+
+' ============================================================
+' FORECASTING INTELLIGENCE
+' ============================================================
+
+entity "forecast_results" as forecast_results {
+    * forecast_result_id : BIGINT <<PK>>
+    --
+    track_id : INT <<FK>>
+    run_id : INT <<FK>>
+    predicted_spotify_streams
+    prediction_date
+    feature_coverage
+    high_forecast_review_flag
+}
+
+
+' ============================================================
+' ARTIST MOMENTUM INTELLIGENCE
+' ============================================================
+
+entity "artist_momentum_results" as artist_momentum_results {
+    * momentum_result_id : BIGINT <<PK>>
+    --
+    artist_id : INT <<FK>>
+    run_id : INT <<FK>>
+    final_momentum_score
+    momentum_category
+    shared_score_rank
+    displayed_position
+}
+
+
+' ============================================================
+' STREAMING ANOMALY INTELLIGENCE
+' ============================================================
+
+entity "streaming_anomaly_results" as streaming_anomaly_results {
+    * anomaly_result_id : BIGINT <<PK>>
+    --
+    source_index
+    observation_id : BIGINT <<FK>>
+    run_id : INT <<FK>>
+    anomaly_score_ratio
+    anomaly_score_margin
+    anomaly_score_excess_pct
+    is_final_pca_anomaly
+    anomaly_direction
+    anomaly_severity
+    severity_rank
+    model_partition
+}
+
+entity "artist_anomaly_summaries" as artist_anomaly_summaries {
+    * artist_anomaly_summary_id : BIGINT <<PK>>
+    --
+    source_artist_label
+    artist_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    artist_review_score
+    latest_observation_date
+    artist_level_explanation
+}
+
+
+' ============================================================
+' GEOGRAPHIC INTELLIGENCE
+' ============================================================
+
+entity "country_geographic_intelligence" as country_geographic_intelligence {
+    * country_geo_result_id : BIGINT <<PK>>
+    --
+    country_id : INT <<FK>>
+    run_id : INT <<FK>>
+    country_findings_index
+    country_findings_class
+}
+
+entity "artist_geographic_intelligence" as artist_geographic_intelligence {
+    * artist_geo_result_id : BIGINT <<PK>>
+    --
+    source_artist_label
+    source_artist_key
+    artist_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    geographic_findings_index
+    geographic_findings_class
+}
+
+entity "track_geographic_intelligence" as track_geographic_intelligence {
+    * track_geo_result_id : BIGINT <<PK>>
+    --
+    source_track_id
+    track_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    geographic_reach_score
+    market_penetration_score
+    geographic_concentration_score
+    geographic_expansion_indicator
+    geographic_intelligence_score
+    geographic_balance_index
+}
+
+entity "track_market_movements" as track_market_movements {
+    * movement_id : BIGINT <<PK>>
+    --
+    source_track_id
+    source_country
+    track_id : INT <<FK, nullable>>
+    country_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+}
+
+
+' ============================================================
+' MARKET GROWTH INTELLIGENCE
+' ============================================================
+
+entity "country_market_growth" as country_market_growth {
+    * country_growth_result_id : BIGINT <<PK>>
+    --
+    source_country
+    country_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    emerging_market_score
+    emerging_market_class
+}
+
+entity "track_market_growth" as track_market_growth {
+    * track_market_growth_id : BIGINT <<PK>>
+    --
+    source_track_id
+    source_country
+    track_id : INT <<FK, nullable>>
+    country_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    market_growth_score
+    market_growth_class
+}
+
+entity "track_growth_intelligence" as track_growth_intelligence {
+    * track_growth_result_id : BIGINT <<PK>>
+    --
+    source_track_id
+    track_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    mean_market_growth_score
+    growth_opportunity_score
+    growth_opportunity_class
+    pmip_growth_score
+    pmip_growth_class
+    pmip_growth_rank
+    pmip_priority_class
+}
+
+entity "artist_market_growth" as artist_market_growth {
+    * artist_market_growth_id : BIGINT <<PK>>
+    --
+    source_artist_label
+    source_artist_key
+    source_country
+    artist_id : INT <<FK, nullable>>
+    country_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    market_growth_score
+    market_growth_class
+}
+
+entity "artist_growth_intelligence" as artist_growth_intelligence {
+    * artist_growth_result_id : BIGINT <<PK>>
+    --
+    source_artist_label
+    source_artist_key
+    artist_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    mean_market_growth_score
+    growth_opportunity_score
+    growth_opportunity_class
+    pmip_growth_score
+    pmip_growth_class
+    pmip_growth_rank
+    pmip_priority_class
+}
+
+
+' ============================================================
+' RELEASE PERFORMANCE INTELLIGENCE
+' ============================================================
+
+entity "release_performance_intelligence" as release_performance_intelligence {
+    * release_performance_id : BIGINT <<PK>>
+    --
+    source_release_id
+    track_id : INT <<FK, nullable>>
+    release_id : INT <<FK, nullable>>
+    run_id : INT <<FK>>
+    composite_release_performance_score
+    release_performance_percentile
+    release_performance_class
+    priority_signal_score
+    high_priority_release_flag
+    human_review_required
+}
+
+
+' ============================================================
+' CORE RELATIONSHIPS
+' ============================================================
+
+artists ||--o{ track_artists : artist_id
+tracks ||--o{ track_artists : track_id
+
+releases ||--o{ release_tracks : release_id
+tracks ||--o{ release_tracks : track_id
+
+tracks ||--o{ streaming_observations : track_id
+countries ||--o{ streaming_observations : country_id
+
+
+' ============================================================
+' FORECASTING
+' ============================================================
+
+tracks ||--o{ forecast_results : track_id
+intelligence_runs ||--o{ forecast_results : run_id
+
+
+' ============================================================
+' MOMENTUM
+' ============================================================
+
+artists ||--o{ artist_momentum_results : artist_id
+intelligence_runs ||--o{ artist_momentum_results : run_id
+
+
+' ============================================================
+' ANOMALY
+' ============================================================
+
+streaming_observations ||--o{ streaming_anomaly_results : observation_id
+intelligence_runs ||--o{ streaming_anomaly_results : run_id
+
+artists |o--o{ artist_anomaly_summaries : artist_id
+intelligence_runs ||--o{ artist_anomaly_summaries : run_id
+
+
+' ============================================================
+' GEOGRAPHIC
+' ============================================================
+
+countries ||--o{ country_geographic_intelligence : country_id
+intelligence_runs ||--o{ country_geographic_intelligence : run_id
+
+artists |o--o{ artist_geographic_intelligence : artist_id
+intelligence_runs ||--o{ artist_geographic_intelligence : run_id
+
+tracks |o--o{ track_geographic_intelligence : track_id
+intelligence_runs ||--o{ track_geographic_intelligence : run_id
+
+tracks |o--o{ track_market_movements : track_id
+countries |o--o{ track_market_movements : country_id
+intelligence_runs ||--o{ track_market_movements : run_id
+
+
+' ============================================================
+' MARKET GROWTH
+' ============================================================
+
+countries |o--o{ country_market_growth : country_id
+intelligence_runs ||--o{ country_market_growth : run_id
+
+tracks |o--o{ track_market_growth : track_id
+countries |o--o{ track_market_growth : country_id
+intelligence_runs ||--o{ track_market_growth : run_id
+
+tracks |o--o{ track_growth_intelligence : track_id
+intelligence_runs ||--o{ track_growth_intelligence : run_id
+
+artists |o--o{ artist_market_growth : artist_id
+countries |o--o{ artist_market_growth : country_id
+intelligence_runs ||--o{ artist_market_growth : run_id
+
+artists |o--o{ artist_growth_intelligence : artist_id
+intelligence_runs ||--o{ artist_growth_intelligence : run_id
+
+
+' ============================================================
+' RELEASE PERFORMANCE
+' ============================================================
+
+tracks |o--o{ release_performance_intelligence : track_id
+releases |o--o{ release_performance_intelligence : release_id
+intelligence_runs ||--o{ release_performance_intelligence : run_id
+
+@enduml
