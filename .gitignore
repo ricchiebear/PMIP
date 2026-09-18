@@ -35,6 +35,8 @@ __pycache__/
 # ============================================================
 .env
 .env.*
+!.env.example
+!backend/.env.example
 
 
 # ============================================================
@@ -74,3 +76,9 @@ models/streaming_anomaly_detection/
 models/geographic_intelligence/
 models/market_growth_intelligence/
 models/release_performance_scoring/
+
+# ============================================================
+# Node.js backend
+# ============================================================
+
+backend/node_modules/
