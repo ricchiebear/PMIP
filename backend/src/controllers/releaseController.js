@@ -1,15 +1,20 @@
 const releaseService = require('../services/releaseService');
 
+
+// ============================================================
 // Release collection
+// ============================================================
+
 async function getReleases(req, res, next) {
   try {
     const page = req.query.page ?? 1;
     const limit = req.query.limit ?? 20;
 
-    const result = await releaseService.getReleases(
-      page,
-      limit
-    );
+    const result =
+      await releaseService.getReleases(
+        page,
+        limit
+      );
 
     return res.status(200).json({
       status: 'success',
@@ -21,7 +26,11 @@ async function getReleases(req, res, next) {
   }
 }
 
+
+// ============================================================
 // Individual release
+// ============================================================
+
 async function getReleaseById(req, res, next) {
   try {
     const { releaseId } = req.params;
@@ -51,7 +60,11 @@ async function getReleaseById(req, res, next) {
   }
 }
 
+
+// ============================================================
 // Release tracks
+// ============================================================
+
 async function getReleaseTracks(req, res, next) {
   try {
     const { releaseId } = req.params;
@@ -84,8 +97,51 @@ async function getReleaseTracks(req, res, next) {
   }
 }
 
+
+// ============================================================
+// Release-performance intelligence
+// ============================================================
+
+async function getReleasePerformance(req, res, next) {
+  try {
+    const { releaseId } = req.params;
+
+    const result =
+      await releaseService.getReleasePerformance(
+        releaseId
+      );
+
+    if (!result) {
+      const error = new Error(
+        'The requested release could not be found.'
+      );
+
+      error.code = 'RESOURCE_NOT_FOUND';
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        release: result.release,
+        performance: result.performance
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
+// ============================================================
+// Exports
+// ============================================================
+
 module.exports = {
   getReleases,
   getReleaseById,
-  getReleaseTracks
+  getReleaseTracks,
+  getReleasePerformance
 };

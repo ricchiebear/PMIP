@@ -339,6 +339,16 @@ async function getArtistGrowthIntelligence(
   };
 }
 
+// Get growth intelligence for one artist
+async function getArtistGrowthIntelligenceByArtistId(artistId) {
+  const parsedArtistId = validateArtistId(artistId);
+
+  return intelligenceRepository
+    .findArtistGrowthIntelligenceByArtistId(
+      parsedArtistId
+    );
+}
+
 async function getTrackGrowthIntelligence(
   page = 1,
   limit = 20
@@ -534,6 +544,7 @@ module.exports = {
 
   getArtistGrowthIntelligence,
   getTrackGrowthIntelligence,
+  getArtistGrowthIntelligenceByArtistId,
 
   getArtistMomentumResults,
   getArtistMomentumResultByArtistId,

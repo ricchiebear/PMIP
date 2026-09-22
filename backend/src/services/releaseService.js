@@ -1,6 +1,10 @@
 const releaseRepository = require('../repositories/releaseRepository');
 
+
+// ============================================================
 // Release ID validation
+// ============================================================
+
 function validateReleaseId(releaseId) {
   const parsedReleaseId = Number(releaseId);
 
@@ -18,7 +22,11 @@ function validateReleaseId(releaseId) {
   return parsedReleaseId;
 }
 
+
+// ============================================================
 // Pagination validation
+// ============================================================
+
 function validatePagination(page = 1, limit = 20) {
   const parsedPage = Number(page);
   const parsedLimit = Number(limit);
@@ -51,7 +59,11 @@ function validatePagination(page = 1, limit = 20) {
   };
 }
 
+
+// ============================================================
 // Release collection
+// ============================================================
+
 async function getReleases(page = 1, limit = 20) {
   const pagination = validatePagination(page, limit);
 
@@ -81,20 +93,31 @@ async function getReleases(page = 1, limit = 20) {
   };
 }
 
+
+// ============================================================
 // Individual release
+// ============================================================
+
 async function getReleaseById(releaseId) {
   const parsedReleaseId = validateReleaseId(releaseId);
 
-  return releaseRepository.findById(parsedReleaseId);
+  return releaseRepository.findById(
+    parsedReleaseId
+  );
 }
 
+
+// ============================================================
 // Release tracks
+// ============================================================
+
 async function getReleaseTracks(releaseId) {
   const parsedReleaseId = validateReleaseId(releaseId);
 
-  const release = await releaseRepository.findById(
-    parsedReleaseId
-  );
+  const release =
+    await releaseRepository.findById(
+      parsedReleaseId
+    );
 
   if (!release) {
     return null;
@@ -111,10 +134,46 @@ async function getReleaseTracks(releaseId) {
   };
 }
 
+
+// ============================================================
+// Release-performance intelligence
+// ============================================================
+
+async function getReleasePerformance(releaseId) {
+  const parsedReleaseId = validateReleaseId(releaseId);
+
+  // Check that the release exists first
+  const release =
+    await releaseRepository.findById(
+      parsedReleaseId
+    );
+
+  if (!release) {
+    return null;
+  }
+
+  // Load all performance rows for this release
+  const performance =
+    await releaseRepository.findPerformanceByReleaseId(
+      parsedReleaseId
+    );
+
+  return {
+    release,
+    performance
+  };
+}
+
+
+// ============================================================
+// Exports
+// ============================================================
+
 module.exports = {
   getReleases,
   getReleaseById,
   getReleaseTracks,
+  getReleasePerformance,
   validateReleaseId,
   validatePagination
 };

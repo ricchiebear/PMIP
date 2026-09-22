@@ -543,6 +543,70 @@ async function countArtistMarketGrowth() {
 }
 
 /**
+ * Retrieve final growth intelligence for one canonical artist.
+ *
+ * Uses the latest market-growth intelligence run.
+ *
+ * @param {number} artistId Canonical PMIP artist ID.
+ * @returns {Promise<Object|null>} Artist growth intelligence result.
+ */
+async function findArtistGrowthIntelligenceByArtistId(artistId) {
+  const [rows] = await db.query(
+    `
+      SELECT
+        agi.artist_growth_result_id,
+
+        agi.source_artist_label,
+        agi.source_artist_key,
+
+        agi.artist_id,
+        a.artist_name,
+
+        agi.mean_market_growth_score,
+        agi.maximum_artist_emerging_market_score,
+        agi.growth_opportunity_score,
+        agi.growth_opportunity_class,
+
+        agi.pmip_growth_score,
+        agi.pmip_growth_class,
+        agi.pmip_growth_rank,
+        agi.pmip_priority_class,
+
+        agi.run_id,
+        ir.component_name,
+        ir.component_version,
+        ir.generated_at,
+
+        agi.calculated_at
+
+      FROM artist_growth_intelligence AS agi
+
+      INNER JOIN artists AS a
+        ON agi.artist_id = a.artist_id
+
+      INNER JOIN intelligence_runs AS ir
+        ON agi.run_id = ir.run_id
+
+      WHERE agi.artist_id = ?
+        AND agi.run_id = (
+          SELECT MAX(run_id)
+          FROM intelligence_runs
+          WHERE component_name = 'market_growth_intelligence'
+        )
+
+      ORDER BY
+        agi.pmip_growth_rank ASC,
+        agi.artist_growth_result_id ASC
+
+      LIMIT 1
+    `,
+    [artistId]
+  );
+
+  return rows[0] || null;
+}
+
+/**
  * Retrieve track market-growth intelligence.
  *
  * LEFT JOINs preserve source-only track and country records
@@ -720,6 +784,8 @@ async function countArtistGrowthIntelligence() {
 
   return Number(rows[0].total);
 }
+
+
 
 /**
  * Retrieve final track growth intelligence.
@@ -1386,6 +1452,7 @@ module.exports = {
   countTrackMarketGrowth,
 
   findArtistGrowthIntelligence,
+  findArtistGrowthIntelligenceByArtistId,
   countArtistGrowthIntelligence,
 
   findTrackGrowthIntelligence,

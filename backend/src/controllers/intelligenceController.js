@@ -1,6 +1,10 @@
 const intelligenceService = require('../services/intelligenceService');
 
+
+// ============================================================
 // Geographic intelligence
+// ============================================================
+
 async function getCountryGeographicIntelligence(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -21,6 +25,7 @@ async function getCountryGeographicIntelligence(req, res, next) {
     return next(error);
   }
 }
+
 
 async function getArtistGeographicIntelligence(req, res, next) {
   try {
@@ -43,6 +48,7 @@ async function getArtistGeographicIntelligence(req, res, next) {
   }
 }
 
+
 async function getTrackGeographicIntelligence(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -64,7 +70,11 @@ async function getTrackGeographicIntelligence(req, res, next) {
   }
 }
 
+
+// ============================================================
 // Market intelligence
+// ============================================================
+
 async function getTrackMarketMovements(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -85,6 +95,7 @@ async function getTrackMarketMovements(req, res, next) {
     return next(error);
   }
 }
+
 
 async function getCountryMarketGrowth(req, res, next) {
   try {
@@ -107,6 +118,7 @@ async function getCountryMarketGrowth(req, res, next) {
   }
 }
 
+
 async function getArtistMarketGrowth(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -127,6 +139,7 @@ async function getArtistMarketGrowth(req, res, next) {
     return next(error);
   }
 }
+
 
 async function getTrackMarketGrowth(req, res, next) {
   try {
@@ -149,7 +162,11 @@ async function getTrackMarketGrowth(req, res, next) {
   }
 }
 
+
+// ============================================================
 // Growth intelligence
+// ============================================================
+
 async function getArtistGrowthIntelligence(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -171,7 +188,42 @@ async function getArtistGrowthIntelligence(req, res, next) {
   }
 }
 
-// Growth intelligence
+
+// Get growth intelligence for one artist
+async function getArtistGrowthIntelligenceByArtistId(
+  req,
+  res,
+  next
+) {
+  try {
+    const { artistId } = req.params;
+
+    const result =
+      await intelligenceService.getArtistGrowthIntelligenceByArtistId(
+        artistId
+      );
+
+    if (!result) {
+      const error = new Error(
+        'No artist growth intelligence result was found for this artist in the latest market-growth intelligence run.'
+      );
+
+      error.code = 'INTELLIGENCE_NOT_FOUND';
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      data: result
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+
 async function getTrackGrowthIntelligence(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -193,7 +245,11 @@ async function getTrackGrowthIntelligence(req, res, next) {
   }
 }
 
+
+// ============================================================
 // Momentum intelligence
+// ============================================================
+
 async function getArtistMomentumResults(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -214,6 +270,7 @@ async function getArtistMomentumResults(req, res, next) {
     return next(error);
   }
 }
+
 
 async function getArtistMomentumResultByArtistId(
   req,
@@ -248,7 +305,11 @@ async function getArtistMomentumResultByArtistId(
   }
 }
 
+
+// ============================================================
 // Forecasting intelligence
+// ============================================================
+
 async function getTrackForecastResults(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -269,6 +330,7 @@ async function getTrackForecastResults(req, res, next) {
     return next(error);
   }
 }
+
 
 async function getTrackForecastResultByTrackId(
   req,
@@ -303,7 +365,11 @@ async function getTrackForecastResultByTrackId(
   }
 }
 
+
+// ============================================================
 // Streaming anomaly intelligence
+// ============================================================
+
 async function getTrackAnomalyResults(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -332,6 +398,7 @@ async function getTrackAnomalyResults(req, res, next) {
   }
 }
 
+
 async function getArtistAnomalySummaries(req, res, next) {
   try {
     const page = req.query.page ?? 1;
@@ -353,6 +420,11 @@ async function getArtistAnomalySummaries(req, res, next) {
   }
 }
 
+
+// ============================================================
+// Exports
+// ============================================================
+
 module.exports = {
   getCountryGeographicIntelligence,
   getArtistGeographicIntelligence,
@@ -364,6 +436,7 @@ module.exports = {
   getTrackMarketGrowth,
 
   getArtistGrowthIntelligence,
+  getArtistGrowthIntelligenceByArtistId,
   getTrackGrowthIntelligence,
 
   getArtistMomentumResults,
