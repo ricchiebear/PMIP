@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/common/PageHeader';
-import ContentSection from '../components/common/ContentSection';
 
 import StreamingTrendChart from '../components/tracks/StreamingTrendChart';
 import ChartPositionTrendChart from '../components/tracks/ChartPositionTrendChart';
@@ -50,13 +48,31 @@ function TracksPage() {
     const parsedCountryId = Number(countryId);
 
 
-    // ----------------------------------------------------------
-    // Validation
-    // ----------------------------------------------------------
+    // ============================================================
+    // Track ID validation
+    // ============================================================
 
     if (
       !Number.isInteger(parsedTrackId) ||
-      parsedTrackId <= 0 ||
+      parsedTrackId <= 0
+    ) {
+      setStreamingHistory([]);
+      setChartPerformance([]);
+      setHasLoaded(false);
+
+      setError(
+        'Enter a track ID using a whole number greater than 0.'
+      );
+
+      return;
+    }
+
+
+    // ============================================================
+    // Country ID validation
+    // ============================================================
+
+    if (
       !Number.isInteger(parsedCountryId) ||
       parsedCountryId <= 0
     ) {
@@ -65,16 +81,16 @@ function TracksPage() {
       setHasLoaded(false);
 
       setError(
-        'Please enter a valid positive track ID and country ID.'
+        'Enter a country ID using a whole number greater than 0.'
       );
 
       return;
     }
 
 
-    // ----------------------------------------------------------
+    // ============================================================
     // Load performance data
-    // ----------------------------------------------------------
+    // ============================================================
 
     try {
       setLoading(true);
@@ -99,7 +115,10 @@ function TracksPage() {
       ]);
 
 
-      // Sort streaming history oldest to newest
+      // ============================================================
+      // Sort streaming history
+      // ============================================================
+
       const sortedStreaming =
         [...(streamingResult.data || [])].sort(
           (a, b) =>
@@ -108,7 +127,10 @@ function TracksPage() {
         );
 
 
-      // Sort chart history oldest to newest
+      // ============================================================
+      // Sort chart history
+      // ============================================================
+
       const sortedChartPerformance =
         [...(chartResult.data || [])].sort(
           (a, b) =>
@@ -132,7 +154,7 @@ function TracksPage() {
 
       setError(
         error.message ||
-        'Unable to load track performance. Please try again.'
+        'We could not load this track performance. Please check the IDs and try again.'
       );
 
       setHasLoaded(true);
@@ -158,34 +180,78 @@ function TracksPage() {
 
 
   // ============================================================
+  // Derived summary values
+  // ============================================================
+
+  const latestStreamingObservation =
+    streamingHistory.length > 0
+      ? streamingHistory[streamingHistory.length - 1]
+      : null;
+
+  const latestChartObservation =
+    chartPerformance.length > 0
+      ? chartPerformance[chartPerformance.length - 1]
+      : null;
+
+
+  // ============================================================
   // Page
   // ============================================================
 
   return (
     <PageContainer>
 
-      {/* Page heading */}
+      {/* ========================================================
+          Page header
+      ======================================================== */}
 
-      <PageHeader
-        title="Tracks"
-        description="Explore track streaming performance and historical chart trends."
-      />
+      <section className="track-page-header">
+        <p className="track-page-kicker">
+          Track Performance
+        </p>
+
+        <h1>
+          Tracks
+        </h1>
+
+        <p>
+          Explore historical streaming activity and chart
+          performance for a selected track and country.
+        </p>
+      </section>
 
 
       {/* ========================================================
           Performance search
       ======================================================== */}
 
-      <ContentSection title="Track Performance Search">
+      <section className="track-search-panel">
 
-        <form onSubmit={handleLoadPerformance}>
+        <div className="track-search-copy">
+          <p className="track-page-kicker">
+            Performance Lookup
+          </p>
 
-          <div>
+          <h2>
+            Load Track Performance
+          </h2>
+
+          <p>
+            Enter a PMIP track ID and country ID to retrieve
+            historical streaming and chart data.
+          </p>
+        </div>
+
+
+        <form
+          className="track-search-form"
+          onSubmit={handleLoadPerformance}
+        >
+
+          <div className="track-search-field">
             <label htmlFor="trackId">
               Track ID
             </label>
-
-            <br />
 
             <input
               id="trackId"
@@ -200,14 +266,11 @@ function TracksPage() {
             />
           </div>
 
-          <br />
 
-          <div>
+          <div className="track-search-field">
             <label htmlFor="countryId">
               Country ID
             </label>
-
-            <br />
 
             <input
               id="countryId"
@@ -222,11 +285,11 @@ function TracksPage() {
             />
           </div>
 
-          <br />
 
           <button
             type="submit"
             disabled={loading}
+            className="track-search-button"
           >
             {loading
               ? 'Loading...'
@@ -235,7 +298,14 @@ function TracksPage() {
 
         </form>
 
-      </ContentSection>
+
+        {error && (
+          <p className="track-search-error">
+            {error}
+          </p>
+        )}
+
+      </section>
 
 
       {/* ========================================================
@@ -243,175 +313,309 @@ function TracksPage() {
       ======================================================== */}
 
       {loading && (
-        <ContentSection title="Loading Performance">
+        <section className="track-state-card">
+          <div
+            className="artist-loading-spinner"
+            aria-hidden="true"
+          />
+
+          <h3>
+            Loading Track Performance
+          </h3>
+
           <p>
-            Loading streaming and chart-performance data...
+            PMIP is retrieving streaming and chart-performance data.
           </p>
-        </ContentSection>
+        </section>
       )}
 
 
       {/* ========================================================
-          Error state
-      ======================================================== */}
-
-      {!loading && error && (
-        <ContentSection title="Unable to Load Performance">
-          <p>
-            {error}
-          </p>
-        </ContentSection>
-      )}
-
-
-      {/* ========================================================
-          Historical streaming performance
+          Performance results
       ======================================================== */}
 
       {hasLoaded &&
         !loading &&
         !error && (
-          <ContentSection title="Historical Streaming Performance">
+          <>
 
-            {streamingHistory.length === 0 ? (
-              <p>
-                No streaming history was found for this track
-                and country.
-              </p>
-            ) : (
-              <>
+            {/* ==================================================
+                Summary metrics
+            ================================================== */}
 
-                {/* Streaming trend chart */}
+            <section className="track-profile-section">
 
-                <StreamingTrendChart
-                  data={streamingHistory}
-                />
+              <div className="track-section-heading">
+                <div>
+                  <p className="track-page-kicker">
+                    Overview
+                  </p>
 
+                  <h2>
+                    Performance Summary
+                  </h2>
+                </div>
 
-                {/* Historical streaming records */}
-
-                {streamingHistory.map(
-                  (observation) => (
-                    <div
-                      key={observation.observation_id}
-                    >
-                      <h3>
-                        {formatDate(
-                          observation.observation_date
-                        )}
-                      </h3>
-
-                      <p>
-                        <strong>
-                          Track:
-                        </strong>{' '}
-                        {observation.track_name}
-                      </p>
-
-                      <p>
-                        <strong>
-                          Country:
-                        </strong>{' '}
-                        {observation.country_name}
-                      </p>
-
-                      <p>
-                        <strong>
-                          Streams:
-                        </strong>{' '}
-                        {Number(
-                          observation.streams
-                        ).toLocaleString()}
-                      </p>
-
-                      <p>
-                        <strong>
-                          Chart Position:
-                        </strong>{' '}
-                        {observation.chart_position ??
-                          'Not available'}
-                      </p>
-
-                      <hr />
-                    </div>
-                  )
-                )}
-
-              </>
-            )}
-
-          </ContentSection>
-        )}
+                <p>
+                  A quick view of the selected track&apos;s latest
+                  available performance.
+                </p>
+              </div>
 
 
-      {/* ========================================================
-          Historical chart performance
-      ======================================================== */}
+              <div className="track-metric-grid">
 
-      {hasLoaded &&
-        !loading &&
-        !error && (
-          <ContentSection title="Historical Chart Performance">
+                <article className="track-metric-card">
+                  <p>
+                    Streaming Observations
+                  </p>
 
-            {chartPerformance.length === 0 ? (
-              <p>
-                No chart-performance history was found for this
-                track and country.
-              </p>
-            ) : (
-              <>
-
-                {/* Chart-position trend chart */}
-
-                <ChartPositionTrendChart
-                  data={chartPerformance}
-                />
+                  <strong>
+                    {streamingHistory.length}
+                  </strong>
+                </article>
 
 
-                {/* Historical chart-position records */}
+                <article className="track-metric-card">
+                  <p>
+                    Latest Streams
+                  </p>
 
-                {chartPerformance.map(
-                  (observation) => (
-                    <div
-                      key={observation.observation_id}
-                    >
-                      <h3>
-                        {formatDate(
-                          observation.observation_date
-                        )}
-                      </h3>
+                  <strong>
+                    {latestStreamingObservation
+                      ? Number(
+                          latestStreamingObservation.streams
+                        ).toLocaleString()
+                      : 'Not available'}
+                  </strong>
+                </article>
 
-                      <p>
-                        <strong>
-                          Track:
-                        </strong>{' '}
-                        {observation.track_name}
-                      </p>
 
-                      <p>
-                        <strong>
-                          Country:
-                        </strong>{' '}
-                        {observation.country_name}
-                      </p>
+                <article className="track-metric-card">
+                  <p>
+                    Latest Chart Position
+                  </p>
 
-                      <p>
-                        <strong>
-                          Chart Position:
-                        </strong>{' '}
-                        {observation.chart_position ??
-                          'Not available'}
-                      </p>
+                  <strong>
+                    {latestChartObservation?.chart_position ??
+                      'Not available'}
+                  </strong>
+                </article>
 
-                      <hr />
-                    </div>
-                  )
-                )}
+              </div>
 
-              </>
-            )}
+            </section>
 
-          </ContentSection>
+
+            {/* ==================================================
+                Streaming performance
+            ================================================== */}
+
+            <section className="track-profile-section">
+
+              <div className="track-section-heading">
+                <div>
+                  <p className="track-page-kicker">
+                    Streaming
+                  </p>
+
+                  <h2>
+                    Historical Streaming Performance
+                  </h2>
+                </div>
+
+                <p>
+                  Review how streaming activity changed over the
+                  available historical period.
+                </p>
+              </div>
+
+
+              {streamingHistory.length === 0 ? (
+                <div className="track-state-card">
+                  <h3>
+                    No Streaming History
+                  </h3>
+
+                  <p>
+                    No streaming history was found for this track
+                    and country.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="track-chart-container">
+                    <StreamingTrendChart
+                      data={streamingHistory}
+                    />
+                  </div>
+
+                  <div className="track-record-grid">
+
+                    {streamingHistory.map(
+                      (observation) => (
+                        <article
+                          key={observation.observation_id}
+                          className="track-record-card"
+                        >
+                          <p className="track-record-date">
+                            {formatDate(
+                              observation.observation_date
+                            )}
+                          </p>
+
+                          <h3>
+                            {observation.track_name}
+                          </h3>
+
+                          <div className="track-record-meta">
+
+                            <div>
+                              <span>
+                                Country
+                              </span>
+
+                              <strong>
+                                {observation.country_name}
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                Streams
+                              </span>
+
+                              <strong>
+                                {Number(
+                                  observation.streams
+                                ).toLocaleString()}
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                Chart Position
+                              </span>
+
+                              <strong>
+                                {observation.chart_position ??
+                                  'Not available'}
+                              </strong>
+                            </div>
+
+                          </div>
+
+                        </article>
+                      )
+                    )}
+
+                  </div>
+                </>
+              )}
+
+            </section>
+
+
+            {/* ==================================================
+                Historical chart performance
+            ================================================== */}
+
+            <section className="track-profile-section">
+
+              <div className="track-section-heading">
+                <div>
+                  <p className="track-page-kicker">
+                    Charts
+                  </p>
+
+                  <h2>
+                    Historical Chart Performance
+                  </h2>
+                </div>
+
+                <p>
+                  Follow how the track&apos;s chart position changed
+                  across the available historical period.
+                </p>
+              </div>
+
+
+              {chartPerformance.length === 0 ? (
+                <div className="track-state-card">
+                  <h3>
+                    No Chart History
+                  </h3>
+
+                  <p>
+                    No chart-performance history was found for this
+                    track and country.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="track-chart-container">
+                    <ChartPositionTrendChart
+                      data={chartPerformance}
+                    />
+                  </div>
+
+                  <div className="track-record-grid">
+
+                    {chartPerformance.map(
+                      (observation) => (
+                        <article
+                          key={observation.observation_id}
+                          className="track-record-card"
+                        >
+                          <p className="track-record-date">
+                            {formatDate(
+                              observation.observation_date
+                            )}
+                          </p>
+
+                          <h3>
+                            {observation.track_name}
+                          </h3>
+
+                          <div className="track-record-meta">
+
+                            <div>
+                              <span>
+                                Country
+                              </span>
+
+                              <strong>
+                                {observation.country_name}
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                Chart Position
+                              </span>
+
+                              <strong>
+                                {observation.chart_position ??
+                                  'Not available'}
+                              </strong>
+                            </div>
+
+                          </div>
+
+                        </article>
+                      )
+                    )}
+
+                  </div>
+                </>
+              )}
+
+            </section>
+
+          </>
         )}
 
     </PageContainer>

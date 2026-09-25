@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/common/PageHeader';
-import ContentSection from '../components/common/ContentSection';
-import SummaryCard from '../components/common/SummaryCard';
 
 import {
   getArtistById,
@@ -30,6 +27,7 @@ function ArtistDetailsPage() {
   // ============================================================
 
   const [artist, setArtist] = useState(null);
+
   const [tracks, setTracks] = useState([]);
 
 
@@ -38,6 +36,7 @@ function ArtistDetailsPage() {
   // ============================================================
 
   const [momentum, setMomentum] = useState(null);
+
   const [growth, setGrowth] = useState(null);
 
 
@@ -46,6 +45,7 @@ function ArtistDetailsPage() {
   // ============================================================
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState('');
 
 
@@ -54,6 +54,7 @@ function ArtistDetailsPage() {
   // ============================================================
 
   const [momentumLoading, setMomentumLoading] = useState(false);
+
   const [momentumError, setMomentumError] = useState('');
 
 
@@ -62,6 +63,7 @@ function ArtistDetailsPage() {
   // ============================================================
 
   const [growthLoading, setGrowthLoading] = useState(false);
+
   const [growthError, setGrowthError] = useState('');
 
 
@@ -71,7 +73,6 @@ function ArtistDetailsPage() {
 
   useEffect(() => {
     async function loadArtistProfile() {
-      // Reset page
       setLoading(true);
       setError('');
 
@@ -119,7 +120,6 @@ function ArtistDetailsPage() {
         return;
       }
 
-      // Essential profile is now ready
       setLoading(false);
 
 
@@ -179,7 +179,6 @@ function ArtistDetailsPage() {
       }
 
 
-      // Load optional intelligence together
       await Promise.all([
         loadMomentum(),
         loadGrowth()
@@ -191,234 +190,441 @@ function ArtistDetailsPage() {
 
 
   // ============================================================
-  // Page
+  // Main loading state
+  // ============================================================
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="artist-profile-state">
+          <div
+            className="artist-loading-spinner"
+            aria-hidden="true"
+          />
+
+          <h2>
+            Loading Artist Profile
+          </h2>
+
+          <p>
+            PMIP is retrieving the artist information and
+            available performance intelligence.
+          </p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+
+  // ============================================================
+  // Main error state
+  // ============================================================
+
+  if (error) {
+    return (
+      <PageContainer>
+        <div className="artist-profile-state artist-profile-error">
+          <h2>
+            Unable to Load Artist
+          </h2>
+
+          <p>
+            {error}
+          </p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+
+  // ============================================================
+  // Artist profile
   // ============================================================
 
   return (
     <PageContainer>
 
-      {/* ========================================================
-          Main loading state
-      ======================================================== */}
+      {artist && (
+        <>
 
-      {loading && (
-        <p>
-          Loading artist profile...
-        </p>
-      )}
+          {/* ====================================================
+              Artist hero
+          ==================================================== */}
 
+          <section className="artist-profile-hero">
 
-      {/* ========================================================
-          Main API/error state
-      ======================================================== */}
+            <div
+              className="artist-profile-avatar"
+              aria-hidden="true"
+            >
+              {artist.artist_name
+                ?.trim()
+                ?.charAt(0)
+                ?.toUpperCase() || 'A'}
+            </div>
 
-      {!loading && error && (
-        <ContentSection title="Unable to Load Artist">
-          <p>
-            {error}
-          </p>
-        </ContentSection>
-      )}
-
-
-      {/* ========================================================
-          Artist profile
-      ======================================================== */}
-
-      {!loading &&
-        !error &&
-        artist && (
-          <>
-
-            {/* Artist heading */}
-
-            <PageHeader
-              title={artist.artist_name}
-              description="Artist profile and performance overview."
-            />
-
-
-            {/* Artist information */}
-
-            <ContentSection title="Artist Information">
-              <p>
-                <strong>
-                  Artist ID:
-                </strong>{' '}
-                {artist.artist_id}
+            <div className="artist-profile-hero-content">
+              <p className="artist-profile-kicker">
+                Artist Profile
               </p>
-            </ContentSection>
+
+              <h1>
+                {artist.artist_name}
+              </h1>
+
+              <p className="artist-profile-description">
+                Explore performance, momentum, growth and
+                associated track information for this artist.
+              </p>
+
+              <div className="artist-profile-meta">
+                <span>
+                  PMIP Artist ID
+                </span>
+
+                <strong>
+                  {artist.artist_id}
+                </strong>
+              </div>
+            </div>
+
+          </section>
 
 
-            {/* Performance summary */}
+          {/* ====================================================
+              Performance overview
+          ==================================================== */}
 
-            <ContentSection title="Performance Summary">
+          <section className="artist-profile-section">
 
-              {/* Track count */}
-
-              <SummaryCard
-                label="Total Associated Tracks"
-                value={tracks.length}
-              />
-
-
-              {/* ==================================================
-                  Momentum intelligence
-              ================================================== */}
-
-              <h3>
-                Momentum Intelligence
-              </h3>
-
-              {momentumLoading && (
-                <p>
-                  Loading momentum intelligence...
+            <div className="artist-profile-section-heading">
+              <div>
+                <p className="artist-profile-kicker">
+                  Overview
                 </p>
-              )}
 
-              {!momentumLoading &&
-                momentum && (
-                  <>
-                    <SummaryCard
-                      label="Momentum Score"
-                      value={
-                        momentum.final_momentum_score
-                      }
-                    />
+                <h2>
+                  Performance Summary
+                </h2>
+              </div>
 
-                    <SummaryCard
-                      label="Momentum Category"
-                      value={
-                        momentum.momentum_category
-                      }
-                    />
-                  </>
-                )}
-
-              {!momentumLoading &&
-                !momentum &&
-                momentumError && (
-                  <p>
-                    Momentum intelligence is unavailable.{' '}
-                    {momentumError}
-                  </p>
-                )}
-
-              {!momentumLoading &&
-                !momentum &&
-                !momentumError && (
-                  <p>
-                    Momentum intelligence is not available
-                    for this artist.
-                  </p>
-                )}
+              <p>
+                Key artist-level metrics currently available
+                through PMIP.
+              </p>
+            </div>
 
 
-              {/* ==================================================
-                  Growth intelligence
-              ================================================== */}
+            <div className="artist-profile-metrics">
 
-              <h3>
-                Growth Intelligence
-              </h3>
-
-              {growthLoading && (
+              <article className="artist-profile-metric-card">
                 <p>
-                  Loading growth intelligence...
+                  Associated Tracks
                 </p>
-              )}
 
-              {!growthLoading &&
-                growth && (
-                  <>
-                    <SummaryCard
-                      label="Growth Score"
-                      value={
-                        growth.pmip_growth_score ??
-                        'Not available'
-                      }
-                    />
+                <strong>
+                  {tracks.length}
+                </strong>
+              </article>
 
-                    <SummaryCard
-                      label="Growth Class"
-                      value={
-                        growth.pmip_growth_class ??
-                        'Not available'
-                      }
-                    />
 
-                    <SummaryCard
-                      label="Growth Rank"
-                      value={
-                        growth.pmip_growth_rank ??
-                        'Not available'
-                      }
-                    />
+              <article className="artist-profile-metric-card">
+                <p>
+                  Momentum Score
+                </p>
 
-                    <SummaryCard
-                      label="Growth Priority"
-                      value={
-                        growth.pmip_priority_class ??
-                        'Not available'
-                      }
-                    />
-                  </>
-                )}
+                <strong>
+                  {momentumLoading
+                    ? 'Loading...'
+                    : momentum?.final_momentum_score ??
+                      'Not available'}
+                </strong>
+              </article>
 
-              {!growthLoading &&
-                !growth &&
-                growthError && (
+
+              <article className="artist-profile-metric-card">
+                <p>
+                  Growth Score
+                </p>
+
+                <strong>
+                  {growthLoading
+                    ? 'Loading...'
+                    : growth?.pmip_growth_score ??
+                      'Not available'}
+                </strong>
+              </article>
+
+            </div>
+
+          </section>
+
+
+          {/* ====================================================
+              Intelligence
+          ==================================================== */}
+
+          <section className="artist-profile-section">
+
+            <div className="artist-profile-section-heading">
+              <div>
+                <p className="artist-profile-kicker">
+                  Intelligence
+                </p>
+
+                <h2>
+                  Artist Intelligence
+                </h2>
+              </div>
+
+              <p>
+                PMIP combines analytical outputs to provide a
+                clearer view of artist momentum and growth.
+              </p>
+            </div>
+
+
+            <div className="artist-intelligence-grid">
+
+              {/* Momentum intelligence */}
+
+              <article className="artist-intelligence-card">
+                <span className="artist-intelligence-badge">
+                  Momentum
+                </span>
+
+                <h3>
+                  Momentum Intelligence
+                </h3>
+
+                {momentumLoading && (
                   <p>
-                    Growth intelligence is unavailable.{' '}
-                    {growthError}
+                    Loading momentum intelligence...
                   </p>
                 )}
 
-              {!growthLoading &&
-                !growth &&
-                !growthError && (
+                {!momentumLoading &&
+                  momentum && (
+                    <div className="artist-intelligence-values">
+
+                      <div>
+                        <span>
+                          Momentum Score
+                        </span>
+
+                        <strong>
+                          {momentum.final_momentum_score}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Momentum Category
+                        </span>
+
+                        <strong>
+                          {momentum.momentum_category}
+                        </strong>
+                      </div>
+
+                      {momentum.shared_score_rank !==
+                        undefined && (
+                        <div>
+                          <span>
+                            Momentum Rank
+                          </span>
+
+                          <strong>
+                            {momentum.shared_score_rank}
+                          </strong>
+                        </div>
+                      )}
+
+                    </div>
+                  )}
+
+                {!momentumLoading &&
+                  !momentum && (
+                    <div className="artist-intelligence-empty">
+                      <p>
+                        Momentum intelligence is currently
+                        unavailable for this artist.
+                      </p>
+
+                      {momentumError && (
+                        <small>
+                          {momentumError}
+                        </small>
+                      )}
+                    </div>
+                  )}
+
+              </article>
+
+
+              {/* Growth intelligence */}
+
+              <article className="artist-intelligence-card">
+                <span className="artist-intelligence-badge">
+                  Growth
+                </span>
+
+                <h3>
+                  Growth Intelligence
+                </h3>
+
+                {growthLoading && (
                   <p>
-                    Growth intelligence is not available
-                    for this artist.
+                    Loading growth intelligence...
                   </p>
                 )}
 
-            </ContentSection>
+                {!growthLoading &&
+                  growth && (
+                    <div className="artist-intelligence-values">
+
+                      <div>
+                        <span>
+                          Growth Score
+                        </span>
+
+                        <strong>
+                          {growth.pmip_growth_score ??
+                            'Not available'}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Growth Class
+                        </span>
+
+                        <strong>
+                          {growth.pmip_growth_class ??
+                            'Not available'}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Growth Rank
+                        </span>
+
+                        <strong>
+                          {growth.pmip_growth_rank ??
+                            'Not available'}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>
+                          Growth Priority
+                        </span>
+
+                        <strong>
+                          {growth.pmip_priority_class ??
+                            'Not available'}
+                        </strong>
+                      </div>
+
+                    </div>
+                  )}
+
+                {!growthLoading &&
+                  !growth && (
+                    <div className="artist-intelligence-empty">
+                      <p>
+                        Growth intelligence is currently
+                        unavailable for this artist.
+                      </p>
+
+                      {growthError && (
+                        <small>
+                          {growthError}
+                        </small>
+                      )}
+                    </div>
+                  )}
+
+              </article>
+
+            </div>
+
+          </section>
 
 
-            {/* Associated tracks */}
+          {/* ====================================================
+              Associated tracks
+          ==================================================== */}
 
-            <ContentSection title="Associated Tracks">
+          <section className="artist-profile-section">
 
-              {tracks.length === 0 ? (
+            <div className="artist-profile-section-heading">
+              <div>
+                <p className="artist-profile-kicker">
+                  Catalogue
+                </p>
+
+                <h2>
+                  Associated Tracks
+                </h2>
+              </div>
+
+              <p>
+                Tracks currently connected to this artist in PMIP.
+              </p>
+            </div>
+
+
+            {tracks.length === 0 ? (
+              <div className="artist-profile-state">
+                <h3>
+                  No Tracks Found
+                </h3>
+
                 <p>
                   No associated tracks were found for this artist.
                 </p>
-              ) : (
-                tracks.map((track) => (
-                  <div
+              </div>
+            ) : (
+              <div className="artist-track-grid">
+
+                {tracks.map((track) => (
+                  <article
                     key={track.track_id}
+                    className="artist-track-card"
                   >
-                    <h3>
-                      {track.track_name}
-                    </h3>
+                    <span
+                      className="artist-track-icon"
+                      aria-hidden="true"
+                    >
+                      ♫
+                    </span>
 
-                    <p>
-                      <strong>
-                        Track ID:
-                      </strong>{' '}
-                      {track.track_id}
-                    </p>
+                    <div>
+                      <p className="artist-track-label">
+                        Track
+                      </p>
 
-                    <hr />
-                  </div>
-                ))
-              )}
+                      <h3>
+                        {track.track_name}
+                      </h3>
 
-            </ContentSection>
+                      <span className="artist-track-id">
+                        PMIP Track ID {track.track_id}
+                      </span>
+                    </div>
 
-          </>
-        )}
+                  </article>
+                ))}
+
+              </div>
+            )}
+
+          </section>
+
+        </>
+      )}
 
     </PageContainer>
   );

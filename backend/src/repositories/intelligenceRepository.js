@@ -1,15 +1,10 @@
 const db = require('../config/database');
 
-/**
- * Retrieve country geographic intelligence.
- *
- * Country information and intelligence-run metadata are joined
- * to make each result understandable and traceable.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Country geographic intelligence results.
- */
+
+// ============================================================
+// Country geographic intelligence
+// ============================================================
+
 async function findCountryGeographicIntelligence(limit, offset) {
   const [rows] = await db.query(
     `
@@ -69,17 +64,14 @@ async function findCountryGeographicIntelligence(limit, offset) {
   return rows;
 }
 
-/**
- * Count country geographic intelligence results
- * belonging to the latest geographic intelligence run.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countCountryGeographicIntelligence() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM country_geographic_intelligence AS cgi
+
       WHERE cgi.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -88,19 +80,16 @@ async function countCountryGeographicIntelligence() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve artist geographic intelligence.
- *
- * Source-only artist records are preserved when no canonical
- * PMIP artist ID is available.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Artist geographic intelligence results.
- */
+
+// ============================================================
+// Artist geographic intelligence
+// ============================================================
+
 async function findArtistGeographicIntelligence(limit, offset) {
   const [rows] = await db.query(
     `
@@ -162,19 +151,14 @@ async function findArtistGeographicIntelligence(limit, offset) {
   return rows;
 }
 
-/**
- * Count artist geographic intelligence results
- * belonging to the latest geographic intelligence run.
- *
- * Source-only records are included in the count.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countArtistGeographicIntelligence() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM artist_geographic_intelligence AS agi
+
       WHERE agi.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -183,20 +167,16 @@ async function countArtistGeographicIntelligence() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve track geographic intelligence.
- *
- * A LEFT JOIN is used for tracks so that geographic intelligence
- * records are preserved even when no canonical PMIP track ID
- * is available.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Track geographic intelligence results.
- */
+
+// ============================================================
+// Track geographic intelligence
+// ============================================================
+
 async function findTrackGeographicIntelligence(limit, offset) {
   const [rows] = await db.query(
     `
@@ -252,19 +232,14 @@ async function findTrackGeographicIntelligence(limit, offset) {
   return rows;
 }
 
-/**
- * Count track geographic intelligence results
- * belonging to the latest geographic intelligence run.
- *
- * Records without a mapped PMIP track ID are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countTrackGeographicIntelligence() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM track_geographic_intelligence AS tgi
+
       WHERE tgi.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -273,19 +248,16 @@ async function countTrackGeographicIntelligence() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve track-market movement intelligence.
- *
- * LEFT JOINs preserve source-only track and country records
- * when canonical PMIP IDs are unavailable.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Track-market movement results.
- */
+
+// ============================================================
+// Track market movements
+// ============================================================
+
 async function findTrackMarketMovements(limit, offset) {
   const [rows] = await db.query(
     `
@@ -331,7 +303,7 @@ async function findTrackMarketMovements(limit, offset) {
       WHERE tmm.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
-        WHERE component_name = 'market_growth_intelligence'
+        WHERE component_name = 'geographic_intelligence'
       )
 
       ORDER BY
@@ -346,40 +318,32 @@ async function findTrackMarketMovements(limit, offset) {
   return rows;
 }
 
-/**
- * Count track-market movement results belonging
- * to the latest market-growth intelligence run.
- *
- * Source-only track and country records are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countTrackMarketMovements() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM track_market_movements AS tmm
+
       WHERE tmm.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
-        WHERE component_name = 'market_growth_intelligence'
+        WHERE component_name = 'geographic_intelligence'
       )
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve country market-growth intelligence.
- *
- * A LEFT JOIN preserves market-growth records when no
- * canonical PMIP country ID is available.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Country market-growth intelligence results.
- */
+
+// ============================================================
+// Country market-growth intelligence
+// ============================================================
+
 async function findCountryMarketGrowth(limit, offset) {
   const [rows] = await db.query(
     `
@@ -428,19 +392,14 @@ async function findCountryMarketGrowth(limit, offset) {
   return rows;
 }
 
-/**
- * Count country market-growth intelligence results
- * belonging to the latest market-growth intelligence run.
- *
- * Records without a mapped PMIP country ID are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countCountryMarketGrowth() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM country_market_growth AS cmg
+
       WHERE cmg.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -449,19 +408,16 @@ async function countCountryMarketGrowth() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve artist market-growth intelligence.
- *
- * LEFT JOINs preserve source-only artist and country records
- * when canonical PMIP IDs are unavailable.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Artist market-growth intelligence results.
- */
+
+// ============================================================
+// Artist market-growth intelligence
+// ============================================================
+
 async function findArtistMarketGrowth(limit, offset) {
   const [rows] = await db.query(
     `
@@ -518,19 +474,14 @@ async function findArtistMarketGrowth(limit, offset) {
   return rows;
 }
 
-/**
- * Count artist market-growth intelligence results
- * belonging to the latest market-growth intelligence run.
- *
- * Source-only artist and country records are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countArtistMarketGrowth() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM artist_market_growth AS amg
+
       WHERE amg.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -539,17 +490,16 @@ async function countArtistMarketGrowth() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve final growth intelligence for one canonical artist.
- *
- * Uses the latest market-growth intelligence run.
- *
- * @param {number} artistId Canonical PMIP artist ID.
- * @returns {Promise<Object|null>} Artist growth intelligence result.
- */
+
+// ============================================================
+// Artist growth intelligence by artist
+// ============================================================
+
 async function findArtistGrowthIntelligenceByArtistId(artistId) {
   const [rows] = await db.query(
     `
@@ -606,16 +556,11 @@ async function findArtistGrowthIntelligenceByArtistId(artistId) {
   return rows[0] || null;
 }
 
-/**
- * Retrieve track market-growth intelligence.
- *
- * LEFT JOINs preserve source-only track and country records
- * when canonical PMIP IDs are unavailable.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Track market-growth intelligence results.
- */
+
+// ============================================================
+// Track market-growth intelligence
+// ============================================================
+
 async function findTrackMarketGrowth(limit, offset) {
   const [rows] = await db.query(
     `
@@ -671,19 +616,14 @@ async function findTrackMarketGrowth(limit, offset) {
   return rows;
 }
 
-/**
- * Count track market-growth intelligence results
- * belonging to the latest market-growth intelligence run.
- *
- * Source-only track and country records are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countTrackMarketGrowth() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM track_market_growth AS tmg
+
       WHERE tmg.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -692,19 +632,16 @@ async function countTrackMarketGrowth() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve final artist growth intelligence.
- *
- * A LEFT JOIN preserves source-only artist intelligence
- * when no canonical PMIP artist ID is available.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Final artist growth intelligence results.
- */
+
+// ============================================================
+// Final artist growth intelligence
+// ============================================================
+
 async function findArtistGrowthIntelligence(limit, offset) {
   const [rows] = await db.query(
     `
@@ -761,19 +698,14 @@ async function findArtistGrowthIntelligence(limit, offset) {
   return rows;
 }
 
-/**
- * Count final artist growth intelligence results
- * belonging to the latest market-growth intelligence run.
- *
- * Source-only artist records are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countArtistGrowthIntelligence() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM artist_growth_intelligence AS agi
+
       WHERE agi.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -782,21 +714,16 @@ async function countArtistGrowthIntelligence() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
 
+// ============================================================
+// Final track growth intelligence
+// ============================================================
 
-/**
- * Retrieve final track growth intelligence.
- *
- * A LEFT JOIN preserves source-only track intelligence
- * when no canonical PMIP track ID is available.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Final track growth intelligence results.
- */
 async function findTrackGrowthIntelligence(limit, offset) {
   const [rows] = await db.query(
     `
@@ -852,19 +779,14 @@ async function findTrackGrowthIntelligence(limit, offset) {
   return rows;
 }
 
-/**
- * Count final track growth intelligence results
- * belonging to the latest market-growth intelligence run.
- *
- * Source-only track records are included.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countTrackGrowthIntelligence() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM track_growth_intelligence AS tgi
+
       WHERE tgi.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -873,19 +795,16 @@ async function countTrackGrowthIntelligence() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve artist momentum results.
- *
- * Results are retrieved from the latest
- * artist_momentum_scoring intelligence run.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Artist momentum results.
- */
+
+// ============================================================
+// Artist momentum intelligence
+// ============================================================
+
 async function findArtistMomentumResults(limit, offset) {
   const [rows] = await db.query(
     `
@@ -939,17 +858,14 @@ async function findArtistMomentumResults(limit, offset) {
   return rows;
 }
 
-/**
- * Count artist momentum results belonging to the latest
- * artist_momentum_scoring intelligence run.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countArtistMomentumResults() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM artist_momentum_results AS amr
+
       WHERE amr.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -958,19 +874,71 @@ async function countArtistMomentumResults() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve track forecasting results.
- *
- * Results are retrieved from the latest
- * artist_performance_forecasting intelligence run.
- *
- * @param {number} limit Maximum number of results to retrieve.
- * @param {number} offset Number of results to skip.
- * @returns {Promise<Array>} Track forecasting results.
- */
+
+// ============================================================
+// Artist momentum intelligence by artist
+// ============================================================
+
+async function findArtistMomentumResultByArtistId(artistId) {
+  const [rows] = await db.query(
+    `
+      SELECT
+        amr.momentum_result_id,
+
+        amr.artist_id,
+        a.artist_name,
+
+        amr.final_momentum_score,
+        amr.momentum_category,
+        amr.shared_score_rank,
+        amr.displayed_position,
+        amr.main_neutral_driver,
+
+        amr.relative_daily_growth_component,
+        amr.listener_peak_ratio_component,
+        amr.growth_contribution,
+        amr.peak_position_contribution,
+
+        amr.run_id,
+        ir.component_name,
+        ir.component_version,
+        ir.generated_at,
+
+        amr.calculated_at
+
+      FROM artist_momentum_results AS amr
+
+      INNER JOIN artists AS a
+        ON amr.artist_id = a.artist_id
+
+      INNER JOIN intelligence_runs AS ir
+        ON amr.run_id = ir.run_id
+
+      WHERE amr.artist_id = ?
+        AND amr.run_id = (
+          SELECT MAX(run_id)
+          FROM intelligence_runs
+          WHERE component_name = 'artist_momentum_scoring'
+        )
+
+      LIMIT 1
+    `,
+    [artistId]
+  );
+
+  return rows[0] || null;
+}
+
+
+// ============================================================
+// Track forecasting intelligence
+// ============================================================
+
 async function findTrackForecastResults(limit, offset) {
   const [rows] = await db.query(
     `
@@ -1025,17 +993,14 @@ async function findTrackForecastResults(limit, offset) {
   return rows;
 }
 
-/**
- * Count track forecasting results belonging to the latest
- * artist_performance_forecasting intelligence run.
- *
- * @returns {Promise<number>} Total number of results.
- */
+
 async function countTrackForecastResults() {
   const [rows] = await db.query(
     `
       SELECT COUNT(*) AS total
+
       FROM forecast_results AS fr
+
       WHERE fr.run_id = (
         SELECT MAX(run_id)
         FROM intelligence_runs
@@ -1044,77 +1009,16 @@ async function countTrackForecastResults() {
     `
   );
 
-  return Number(rows[0].total);
-}
-
-/**
- * Retrieve the latest momentum result for a specific artist.
- *
- * The result must belong to the latest
- * artist_momentum_scoring intelligence run.
- *
- * @param {number} artistId PMIP artist ID.
- * @returns {Promise<Object|null>} Artist momentum result or null.
- */
-async function findArtistMomentumResultByArtistId(artistId) {
-  const [rows] = await db.query(
-    `
-      SELECT
-        amr.momentum_result_id,
-
-        amr.artist_id,
-        a.artist_name,
-
-        amr.final_momentum_score,
-        amr.momentum_category,
-        amr.shared_score_rank,
-        amr.displayed_position,
-        amr.main_neutral_driver,
-
-        amr.relative_daily_growth_component,
-        amr.listener_peak_ratio_component,
-        amr.growth_contribution,
-        amr.peak_position_contribution,
-
-        amr.run_id,
-        ir.component_name,
-        ir.component_version,
-        ir.generated_at,
-
-        amr.calculated_at
-
-      FROM artist_momentum_results AS amr
-
-      INNER JOIN artists AS a
-        ON amr.artist_id = a.artist_id
-
-      INNER JOIN intelligence_runs AS ir
-        ON amr.run_id = ir.run_id
-
-      WHERE amr.artist_id = ?
-        AND amr.run_id = (
-          SELECT MAX(run_id)
-          FROM intelligence_runs
-          WHERE component_name = 'artist_momentum_scoring'
-        )
-
-      LIMIT 1
-    `,
-    [artistId]
+  return Number(
+    rows[0].total
   );
-
-  return rows[0] || null;
 }
 
-/**
- * Retrieve the latest forecasting result for a specific track.
- *
- * The result must belong to the latest
- * artist_performance_forecasting intelligence run.
- *
- * @param {number} trackId PMIP track ID.
- * @returns {Promise<Object|null>} Track forecast result or null.
- */
+
+// ============================================================
+// Track forecasting intelligence by track
+// ============================================================
+
 async function findTrackForecastResultByTrackId(trackId) {
   const [rows] = await db.query(
     `
@@ -1166,20 +1070,11 @@ async function findTrackForecastResultByTrackId(trackId) {
   return rows[0] || null;
 }
 
-/**
- * Retrieve deduplicated track-level streaming anomaly results.
- *
- * One anomaly result is returned per observation_id.
- * When repeated source rows exist for the same observation,
- * the row with the smallest anomaly_result_id is retained.
- *
- * Results come from the latest streaming_anomaly_detection run.
- *
- * @param {number} limit Maximum number of results.
- * @param {number} offset Number of results to skip.
- * @param {boolean} finalOnly Whether to return only final PCA anomalies.
- * @returns {Promise<Array>} Track anomaly results.
- */
+
+// ============================================================
+// Track anomaly intelligence
+// ============================================================
+
 async function findTrackAnomalyResults(
   limit,
   offset,
@@ -1243,7 +1138,9 @@ async function findTrackAnomalyResults(
 
       AND sar.anomaly_result_id = (
         SELECT MIN(sar2.anomaly_result_id)
+
         FROM streaming_anomaly_results AS sar2
+
         WHERE sar2.observation_id = sar.observation_id
           AND sar2.run_id = sar.run_id
           ${
@@ -1267,12 +1164,6 @@ async function findTrackAnomalyResults(
 }
 
 
-/**
- * Count deduplicated track-level streaming anomaly results.
- *
- * @param {boolean} finalOnly Whether to count only final PCA anomalies.
- * @returns {Promise<number>} Total number of anomaly results.
- */
 async function countTrackAnomalyResults(finalOnly = true) {
   const finalCondition = finalOnly
     ? 'AND sar.is_final_pca_anomaly = 1'
@@ -1280,7 +1171,8 @@ async function countTrackAnomalyResults(finalOnly = true) {
 
   const [rows] = await db.query(
     `
-      SELECT COUNT(DISTINCT sar.observation_id) AS total
+      SELECT
+        COUNT(DISTINCT sar.observation_id) AS total
 
       FROM streaming_anomaly_results AS sar
 
@@ -1294,22 +1186,16 @@ async function countTrackAnomalyResults(finalOnly = true) {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
-/**
- * Retrieve deduplicated artist-level streaming anomaly summaries.
- *
- * Multiple source artist labels may map to the same canonical
- * PMIP artist. Those rows are combined so that each artist
- * appears only once in the API.
- *
- * Results come from the latest streaming_anomaly_detection run.
- *
- * @param {number} limit Maximum number of artists.
- * @param {number} offset Number of artists to skip.
- * @returns {Promise<Array>} Canonical artist anomaly summaries.
- */
+
+// ============================================================
+// Artist anomaly intelligence
+// ============================================================
+
 async function findArtistAnomalySummaries(
   limit,
   offset
@@ -1326,14 +1212,26 @@ async function findArtistAnomalySummaries(
           SEPARATOR ', '
         ) AS source_artist_labels,
 
-        SUM(aas.total_observations) AS total_observations,
-        SUM(aas.final_anomaly_count) AS final_anomaly_count,
-        SUM(aas.high_priority_anomaly_count) AS high_priority_anomaly_count,
-        SUM(aas.extreme_anomaly_count) AS extreme_anomaly_count,
+        SUM(aas.total_observations)
+          AS total_observations,
 
-        SUM(aas.positive_anomaly_count) AS positive_anomaly_count,
-        SUM(aas.negative_anomaly_count) AS negative_anomaly_count,
-        SUM(aas.flat_anomaly_count) AS flat_anomaly_count,
+        SUM(aas.final_anomaly_count)
+          AS final_anomaly_count,
+
+        SUM(aas.high_priority_anomaly_count)
+          AS high_priority_anomaly_count,
+
+        SUM(aas.extreme_anomaly_count)
+          AS extreme_anomaly_count,
+
+        SUM(aas.positive_anomaly_count)
+          AS positive_anomaly_count,
+
+        SUM(aas.negative_anomaly_count)
+          AS negative_anomaly_count,
+
+        SUM(aas.flat_anomaly_count)
+          AS flat_anomaly_count,
 
         CASE
           WHEN SUM(aas.total_observations) > 0
@@ -1353,19 +1251,25 @@ async function findArtistAnomalySummaries(
           ELSE 0
         END AS high_priority_share_pct,
 
-        MAX(aas.maximum_pca_score) AS maximum_pca_score,
-        MAX(aas.maximum_anomaly_score_ratio) AS maximum_anomaly_score_ratio,
+        MAX(aas.maximum_pca_score)
+          AS maximum_pca_score,
 
-        MAX(aas.artist_review_score) AS artist_review_score,
+        MAX(aas.maximum_anomaly_score_ratio)
+          AS maximum_anomaly_score_ratio,
 
-        MAX(aas.latest_observation_date) AS latest_observation_date,
+        MAX(aas.artist_review_score)
+          AS artist_review_score,
+
+        MAX(aas.latest_observation_date)
+          AS latest_observation_date,
 
         aas.run_id,
         ir.component_name,
         ir.component_version,
         ir.generated_at,
 
-        MAX(aas.calculated_at) AS calculated_at
+        MAX(aas.calculated_at)
+          AS calculated_at
 
       FROM artist_anomaly_summaries AS aas
 
@@ -1403,16 +1307,11 @@ async function findArtistAnomalySummaries(
 }
 
 
-/**
- * Count unique canonical artists with anomaly summaries
- * in the latest streaming_anomaly_detection run.
- *
- * @returns {Promise<number>} Total number of unique artists.
- */
 async function countArtistAnomalySummaries() {
   const [rows] = await db.query(
     `
-      SELECT COUNT(DISTINCT aas.artist_id) AS total
+      SELECT
+        COUNT(DISTINCT aas.artist_id) AS total
 
       FROM artist_anomaly_summaries AS aas
 
@@ -1424,10 +1323,15 @@ async function countArtistAnomalySummaries() {
     `
   );
 
-  return Number(rows[0].total);
+  return Number(
+    rows[0].total
+  );
 }
 
 
+// ============================================================
+// Exports
+// ============================================================
 
 module.exports = {
   findCountryGeographicIntelligence,
@@ -1471,5 +1375,4 @@ module.exports = {
 
   findArtistAnomalySummaries,
   countArtistAnomalySummaries
-  
 };

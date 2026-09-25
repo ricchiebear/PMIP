@@ -1,8 +1,8 @@
 function PageContainer({ children }) {
   return (
-    <main className="page-container">
+    <div className="page-container">
       {children}
-    </main>
+    </div>
   );
 }
 

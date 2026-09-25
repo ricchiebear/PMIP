@@ -7,6 +7,11 @@ import {
   getArtistMarketGrowth
 } from '../../services/intelligenceService';
 
+import {
+  getCountryName
+} from '../../utils/countryNames';
+
+
 function ArtistMarketGrowthSection() {
   // ============================================================
   // Data
@@ -52,7 +57,8 @@ function ArtistMarketGrowthSection() {
       setArtists([]);
 
       setError(
-        error.message
+        error.message ||
+        'Unable to load artist market-growth intelligence.'
       );
 
       setHasLoaded(true);
@@ -75,7 +81,13 @@ function ArtistMarketGrowthSection() {
       return 'Not available';
     }
 
-    return Number(value).toLocaleString(
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+      return 'Not available';
+    }
+
+    return number.toLocaleString(
       undefined,
       {
         maximumFractionDigits: 2
@@ -102,10 +114,11 @@ function ArtistMarketGrowthSection() {
   // ============================================================
 
   function getCountryLabel(artist) {
-    return (
+    return getCountryName(
       artist.country_name ||
-      artist.source_country ||
-      'Unknown market'
+      artist.source_country,
+      artist.country_code ||
+      artist.source_country
     );
   }
 
@@ -115,11 +128,16 @@ function ArtistMarketGrowthSection() {
   // ============================================================
 
   return (
-    <ContentSection title="Artist Market Growth">
+    <ContentSection
+      title="Artist Market Growth"
+      eyebrow="Market-Growth Intelligence"
+      variant="intelligence"
+    >
 
       <p>
-        Explore artists showing strong growth within individual
-        country markets.
+        See which artists are showing stronger growth within
+        individual country markets. This helps highlight where
+        an artist&apos;s performance may be gaining momentum.
       </p>
 
       <br />
@@ -135,98 +153,197 @@ function ArtistMarketGrowthSection() {
       </button>
 
 
-      {/* Error state */}
+      {/* ========================================================
+          Loading state
+      ======================================================== */}
 
-      {error && (
-        <>
-          <br />
-
-          <p>
-            {error}
-          </p>
-        </>
+      {loading && (
+        <p className="intelligence-state-message">
+          Loading artist market-growth intelligence...
+        </p>
       )}
 
 
-      {/* Empty state */}
+      {/* ========================================================
+          Error state
+      ======================================================== */}
 
-      {hasLoaded &&
-        !error &&
-        artists.length === 0 && (
-          <>
-            <br />
-
-            <p>
-              No artist market-growth intelligence was found.
-            </p>
-          </>
+      {!loading &&
+        error && (
+          <p className="intelligence-state-message intelligence-state-error">
+            {error}
+          </p>
         )}
 
 
-      {/* Results */}
+      {/* ========================================================
+          Empty state
+      ======================================================== */}
 
-      {artists.length > 0 && (
-        <>
-          <br />
+      {hasLoaded &&
+        !loading &&
+        !error &&
+        artists.length === 0 && (
+          <p className="intelligence-state-message">
+            No artist market-growth intelligence was found.
+          </p>
+        )}
 
-          {artists.map(
-            (artist) => (
-              <div
-                key={artist.artist_market_growth_id}
-              >
-                <h3>
-                  {getArtistLabel(artist)}
-                </h3>
 
-                <SummaryCard
-                  label="Market"
-                  value={
-                    getCountryLabel(artist)
-                  }
-                />
+      {/* ========================================================
+          Results
+      ======================================================== */}
 
-                <SummaryCard
-                  label="Market Growth Score"
-                  value={
-                    formatNumber(
-                      artist.market_growth_score
-                    )
-                  }
-                />
+      {!loading &&
+        !error &&
+        artists.length > 0 && (
+          <div className="artist-market-growth-results-list">
 
-                <SummaryCard
-                  label="Market Growth Class"
-                  value={
-                    artist.market_growth_class
-                  }
-                />
+            {artists.map(
+              (artist) => (
+                <article
+                  className="artist-market-growth-result-card"
+                  key={artist.artist_market_growth_id}
+                >
 
-                <h4>
-                  What does this mean?
-                </h4>
+                  {/* ==========================================
+                      Artist heading
+                  ========================================== */}
 
-                <p>
-                  PMIP identified strong growth activity for this
-                  artist in the {getCountryLabel(artist)} market.
-                </p>
+                  <div className="artist-market-growth-header">
 
-                <p>
-                  The market-growth score is{' '}
-                  {formatNumber(
-                    artist.market_growth_score
-                  )}, classified as{' '}
-                  {artist.market_growth_class}.
-                </p>
+                    <div>
+                      <p className="anomaly-result-kicker">
+                        Artist Market Profile
+                      </p>
 
-                <hr />
-              </div>
-            )
-          )}
-        </>
-      )}
+                      <h3>
+                        {getArtistLabel(artist)}
+                      </h3>
+
+                      <p className="artist-market-growth-market">
+                        {getCountryLabel(artist)}
+                      </p>
+                    </div>
+
+
+                    <span className="market-growth-classification-badge">
+                      {artist.market_growth_class ||
+                        'Not available'}
+                    </span>
+
+                  </div>
+
+
+                  {/* ==========================================
+                      Main metrics
+                  ========================================== */}
+
+                  <div className="artist-market-growth-metric-grid">
+
+                    <SummaryCard
+                      label="Market"
+                      value={
+                        getCountryLabel(artist)
+                      }
+                      helperText="The country market where this artist's growth is being measured."
+                    />
+
+
+                    <SummaryCard
+                      label="Market Growth Score"
+                      value={
+                        formatNumber(
+                          artist.market_growth_score
+                        )
+                      }
+                      helperText="An overall PMIP score showing the strength of this artist's growth within the selected market. Higher values indicate stronger growth."
+                      tone="highlight"
+                    />
+
+
+                    <SummaryCard
+                      label="Market Growth Class"
+                      value={
+                        artist.market_growth_class ||
+                        'Not available'
+                      }
+                      helperText="A simple category that describes the strength of the artist's growth within this market."
+                    />
+
+                  </div>
+
+
+                  {/* ==========================================
+                      Interpretation
+                  ========================================== */}
+
+                  <div className="anomaly-interpretation">
+
+                    <p className="intelligence-insight-kicker">
+                      PMIP Interpretation
+                    </p>
+
+                    <h4>
+                      What does this mean?
+                    </h4>
+
+
+                    <p>
+                      PMIP has identified growth activity for{' '}
+
+                      <strong>
+                        {getArtistLabel(artist)}
+                      </strong>
+
+                      {' '}in{' '}
+
+                      <strong>
+                        {getCountryLabel(artist)}
+                      </strong>
+
+                      .
+                    </p>
+
+
+                    <p>
+                      The artist&apos;s Market Growth Score is{' '}
+
+                      <strong>
+                        {formatNumber(
+                          artist.market_growth_score
+                        )}
+                      </strong>
+
+                      . PMIP places this result in the{' '}
+
+                      <strong>
+                        {artist.market_growth_class ||
+                          'Not available'}
+                      </strong>
+
+                      {' '}growth category.
+                    </p>
+
+
+                    <p>
+                      This gives a simple view of how strongly the
+                      artist&apos;s performance appears to be growing
+                      within this specific market.
+                    </p>
+
+                  </div>
+
+                </article>
+              )
+            )}
+
+          </div>
+        )}
 
     </ContentSection>
   );
 }
+
 
 export default ArtistMarketGrowthSection;

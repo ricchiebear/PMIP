@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import PageContainer from '../components/layout/PageContainer';
-import PageHeader from '../components/common/PageHeader';
 import ContentSection from '../components/common/ContentSection';
 import SummaryCard from '../components/common/SummaryCard';
 
@@ -30,11 +29,8 @@ function IntelligencePage() {
   // ============================================================
 
   const [artistId, setArtistId] = useState('2');
-
   const [momentum, setMomentum] = useState(null);
-
   const [momentumLoading, setMomentumLoading] = useState(false);
-
   const [momentumError, setMomentumError] = useState('');
 
 
@@ -43,11 +39,8 @@ function IntelligencePage() {
   // ============================================================
 
   const [trackId, setTrackId] = useState('119');
-
   const [forecast, setForecast] = useState(null);
-
   const [forecastLoading, setForecastLoading] = useState(false);
-
   const [forecastError, setForecastError] = useState('');
 
 
@@ -104,8 +97,6 @@ function IntelligencePage() {
 
     const parsedArtistId = Number(artistId);
 
-
-    // Validation
     if (
       !Number.isInteger(parsedArtistId) ||
       parsedArtistId <= 0
@@ -113,14 +104,12 @@ function IntelligencePage() {
       setMomentum(null);
 
       setMomentumError(
-        'Please enter a valid positive artist ID.'
+        'Enter an artist ID using a whole number greater than 0.'
       );
 
       return;
     }
 
-
-    // Load momentum
     try {
       setMomentumLoading(true);
       setMomentumError('');
@@ -162,8 +151,6 @@ function IntelligencePage() {
 
     const parsedTrackId = Number(trackId);
 
-
-    // Validation
     if (
       !Number.isInteger(parsedTrackId) ||
       parsedTrackId <= 0
@@ -171,14 +158,12 @@ function IntelligencePage() {
       setForecast(null);
 
       setForecastError(
-        'Please enter a valid positive track ID.'
+        'Enter a track ID using a whole number greater than 0.'
       );
 
       return;
     }
 
-
-    // Load forecast
     try {
       setForecastLoading(true);
       setForecastError('');
@@ -328,7 +313,14 @@ function IntelligencePage() {
       return 'Not available';
     }
 
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }
+    );
   }
 
 
@@ -339,22 +331,110 @@ function IntelligencePage() {
   return (
     <PageContainer>
 
-      <PageHeader
-        title="Intelligence"
-        description="Explore momentum, forecasting, geographic, growth and anomaly intelligence."
-      />
+      {/* ========================================================
+          Intelligence page hero
+      ======================================================== */}
+
+      <section className="intelligence-page-hero">
+
+        <p className="intelligence-page-kicker">
+          PMIP Intelligence
+        </p>
+
+        <h1>
+          Intelligence
+        </h1>
+
+        <p className="intelligence-page-description">
+          Explore artist momentum, track forecasting, unusual
+          streaming activity, geographic performance and market
+          growth in one place.
+        </p>
+
+
+        <div className="intelligence-overview-grid">
+
+          <article className="intelligence-overview-card">
+            <span className="intelligence-overview-label">
+              Momentum
+            </span>
+
+            <h3>
+              Artist Momentum
+            </h3>
+
+            <p>
+              See whether an artist&apos;s recent performance is
+              building, holding steady or losing strength.
+            </p>
+          </article>
+
+
+          <article className="intelligence-overview-card">
+            <span className="intelligence-overview-label">
+              Forecasting
+            </span>
+
+            <h3>
+              Track Forecasting
+            </h3>
+
+            <p>
+              See how close PMIP&apos;s predicted stream total was
+              to the track&apos;s actual performance.
+            </p>
+          </article>
+
+
+          <article className="intelligence-overview-card">
+            <span className="intelligence-overview-label">
+              Anomalies
+            </span>
+
+            <h3>
+              Streaming Anomalies
+            </h3>
+
+            <p>
+              Review unusual streaming behaviour identified by PMIP.
+            </p>
+          </article>
+
+
+          <article className="intelligence-overview-card">
+            <span className="intelligence-overview-label">
+              Markets
+            </span>
+
+            <h3>
+              Geographic &amp; Growth
+            </h3>
+
+            <p>
+              Explore country performance and emerging market signals.
+            </p>
+          </article>
+
+        </div>
+
+      </section>
 
 
       {/* ========================================================
           Artist momentum intelligence
       ======================================================== */}
 
-      <ContentSection title="Artist Momentum Intelligence">
+      <ContentSection
+        title="Artist Momentum Intelligence"
+        eyebrow="Momentum"
+        variant="intelligence"
+      >
 
         <p>
-          Momentum helps describe how strongly an artist is
-          currently performing based on the signals analysed by
-          PMIP.
+          Momentum shows the current strength of an artist&apos;s
+          performance. PMIP combines available performance signals
+          into one score so it is easier to see whether the artist
+          is gaining attention and activity.
         </p>
 
         <br />
@@ -364,8 +444,6 @@ function IntelligencePage() {
           <label htmlFor="artistId">
             Artist ID
           </label>
-
-          <br />
 
           <input
             id="artistId"
@@ -379,9 +457,6 @@ function IntelligencePage() {
             }
           />
 
-          <br />
-          <br />
-
           <button
             type="submit"
             disabled={momentumLoading}
@@ -394,66 +469,61 @@ function IntelligencePage() {
         </form>
 
 
-        {/* Momentum loading */}
-
         {momentumLoading && (
-          <>
-            <br />
-
-            <p>
-              Loading artist momentum intelligence...
-            </p>
-          </>
+          <p>
+            Loading artist momentum intelligence...
+          </p>
         )}
 
 
-        {/* Momentum error / unavailable */}
-
         {!momentumLoading &&
           momentumError && (
-            <>
-              <br />
-
-              <p>
-                {momentumError}
-              </p>
-            </>
+            <p>
+              {momentumError}
+            </p>
           )}
 
-
-        {/* Momentum result */}
 
         {!momentumLoading &&
           !momentumError &&
           momentum && (
             <>
-              <br />
 
-              <h3>
-                {momentum.artist_name}
-              </h3>
+              <div className="intelligence-summary-grid">
 
-              <SummaryCard
-                label="Momentum Score"
-                value={
-                  momentum.final_momentum_score
-                }
-              />
+                <SummaryCard
+                  label="Momentum Score"
+                  value={
+                    formatNumber(
+                      momentum.final_momentum_score
+                    )
+                  }
+                  helperText="A score from 0 to 100 showing the overall strength of the artist's current momentum. Higher scores indicate stronger momentum."
+                  tone="highlight"
+                />
 
-              <SummaryCard
-                label="Momentum Category"
-                value={
-                  momentum.momentum_category
-                }
-              />
 
-              <SummaryCard
-                label="Momentum Rank"
-                value={
-                  momentum.shared_score_rank ??
-                  'Not available'
-                }
-              />
+                <SummaryCard
+                  label="Momentum Category"
+                  value={
+                    momentum.momentum_category ||
+                    'Not available'
+                  }
+                  helperText="A simple category that describes the strength of the artist's current momentum."
+                />
+
+
+                <SummaryCard
+                  label="Momentum Rank"
+                  value={
+                    momentum.shared_score_rank ??
+                    'Not available'
+                  }
+                  helperText="Shows where this artist sits compared with other artists measured by PMIP. A smaller rank number means a higher position."
+                />
+
+              </div>
+
 
               <MomentumScoreChart
                 artistName={
@@ -464,23 +534,80 @@ function IntelligencePage() {
                 }
               />
 
-              <h3>
-                What does this mean?
-              </h3>
 
-              <p>
-                {momentum.artist_name} has a momentum score of{' '}
-                {momentum.final_momentum_score} and is currently
-                classified as{' '}
-                {momentum.momentum_category}.
-              </p>
+              <div className="intelligence-insight-card">
 
-              {momentum.main_neutral_driver && (
-                <p>
-                  Main contributing signal:{' '}
-                  {momentum.main_neutral_driver}.
+                <div className="intelligence-insight-header">
+
+                  <div>
+                    <p className="intelligence-insight-kicker">
+                      PMIP Interpretation
+                    </p>
+
+                    <h3>
+                      What does this mean?
+                    </h3>
+                  </div>
+
+
+                  <span className="intelligence-insight-badge">
+                    {momentum.momentum_category ||
+                      'Not available'}
+                  </span>
+
+                </div>
+
+
+                <p className="intelligence-insight-text">
+
+                  <strong>
+                    {momentum.artist_name ||
+                      'This artist'}
+                  </strong>
+
+                  {' '}has a current momentum score of{' '}
+
+                  <strong>
+                    {formatNumber(
+                      momentum.final_momentum_score
+                    )}
+                  </strong>
+
+                  {' '}out of 100. PMIP places this artist in the{' '}
+
+                  <strong>
+                    {momentum.momentum_category ||
+                      'Not available'}
+                  </strong>
+
+                  {' '}momentum category. This gives a simple view
+                  of how strong the artist&apos;s recent performance
+                  signals are.
                 </p>
-              )}
+
+
+                {momentum.main_neutral_driver && (
+                  <div className="intelligence-driver-card">
+
+                    <span>
+                      Main contributing signal
+                    </span>
+
+                    <strong>
+                      {momentum.main_neutral_driver}
+                    </strong>
+
+                    <p>
+                      This is the performance signal that contributed
+                      most strongly to the artist&apos;s current
+                      momentum result.
+                    </p>
+
+                  </div>
+                )}
+
+              </div>
+
             </>
           )}
 
@@ -491,11 +618,17 @@ function IntelligencePage() {
           Track forecasting intelligence
       ======================================================== */}
 
-      <ContentSection title="Track Forecasting Intelligence">
+      <ContentSection
+        title="Track Forecasting Intelligence"
+        eyebrow="Forecasting"
+        variant="intelligence"
+      >
 
         <p>
-          Forecasting compares PMIP&apos;s predicted Spotify stream
-          performance with the observed stream total for a track.
+          Forecasting shows how close PMIP&apos;s predicted Spotify
+          stream total was to the track&apos;s actual stream total.
+          This helps show how accurately the model estimated the
+          track&apos;s performance.
         </p>
 
         <br />
@@ -505,8 +638,6 @@ function IntelligencePage() {
           <label htmlFor="forecastTrackId">
             Track ID
           </label>
-
-          <br />
 
           <input
             id="forecastTrackId"
@@ -520,9 +651,6 @@ function IntelligencePage() {
             }
           />
 
-          <br />
-          <br />
-
           <button
             type="submit"
             disabled={forecastLoading}
@@ -535,82 +663,96 @@ function IntelligencePage() {
         </form>
 
 
-        {/* Forecast loading */}
-
         {forecastLoading && (
-          <>
-            <br />
-
-            <p>
-              Loading track forecasting intelligence...
-            </p>
-          </>
+          <p>
+            Loading track forecasting intelligence...
+          </p>
         )}
 
 
-        {/* Forecast error / unavailable */}
-
         {!forecastLoading &&
           forecastError && (
-            <>
-              <br />
-
-              <p>
-                {forecastError}
-              </p>
-            </>
+            <p>
+              {forecastError}
+            </p>
           )}
 
-
-        {/* Forecast result */}
 
         {!forecastLoading &&
           !forecastError &&
           forecast && (
             <>
-              <br />
 
-              <h3>
-                {forecast.track_name}
-              </h3>
+              <div className="intelligence-result-heading">
 
-              <SummaryCard
-                label="Predicted Spotify Streams"
-                value={
-                  formatNumber(
-                    forecast.predicted_spotify_streams
-                  )
-                }
-              />
+                <p className="intelligence-result-kicker">
+                  Forecast Result
+                </p>
 
-              <SummaryCard
-                label="Actual Spotify Streams"
-                value={
-                  formatNumber(
-                    forecast.actual_spotify_streams
-                  )
-                }
-              />
+                <h3>
+                  {forecast.track_name ||
+                    `Track ${trackId}`}
+                </h3>
 
-              <SummaryCard
-                label="Prediction Difference"
-                value={
-                  formatNumber(
-                    forecast.absolute_prediction_error
-                  )
-                }
-              />
+              </div>
 
-              <SummaryCard
-                label="Forecast Review Status"
-                value={
-                  Number(
-                    forecast.high_forecast_review_flag
-                  ) === 1
-                    ? 'Review Recommended'
-                    : 'No Review Flag'
-                }
-              />
+
+              <div className="intelligence-summary-grid intelligence-summary-grid-four">
+
+                <SummaryCard
+                  label="Predicted Streams"
+                  value={
+                    formatNumber(
+                      forecast.predicted_spotify_streams
+                    )
+                  }
+                  helperText="The number of Spotify streams PMIP expected this track to receive."
+                />
+
+
+                <SummaryCard
+                  label="Actual Streams"
+                  value={
+                    formatNumber(
+                      forecast.actual_spotify_streams
+                    )
+                  }
+                  helperText="The number of Spotify streams the track actually received."
+                />
+
+
+                <SummaryCard
+                  label="Prediction Difference"
+                  value={
+                    formatNumber(
+                      forecast.absolute_prediction_error
+                    )
+                  }
+                  helperText="Shows how far PMIP's prediction was from the actual stream total. A smaller difference means the prediction was closer."
+                />
+
+
+                <SummaryCard
+                  label="Review Status"
+                  value={
+                    Number(
+                      forecast.high_forecast_review_flag
+                    ) === 1
+                      ? 'Review Recommended'
+                      : 'No Review Flag'
+                  }
+                  helperText={
+                    Number(
+                      forecast.high_forecast_review_flag
+                    ) === 1
+                      ? 'PMIP found a large enough difference between the prediction and the actual result that this forecast should be looked at more closely.'
+                      : 'PMIP did not find a large enough difference to require additional review.'
+                  }
+                  tone="highlight"
+                />
+
+              </div>
+
 
               <ForecastComparisonChart
                 trackName={
@@ -624,33 +766,109 @@ function IntelligencePage() {
                 }
               />
 
-              <h3>
-                What does this mean?
-              </h3>
 
-              <p>
-                PMIP predicted approximately{' '}
-                {formatNumber(
-                  forecast.predicted_spotify_streams
-                )}{' '}
-                Spotify streams for {forecast.track_name}.
-              </p>
+              <div className="intelligence-insight-card">
 
-              <p>
-                The observed stream total was approximately{' '}
-                {formatNumber(
-                  forecast.actual_spotify_streams
-                )}.
-              </p>
+                <div className="intelligence-insight-header">
 
-              <p>
-                The difference between the prediction and the
-                observed result was approximately{' '}
-                {formatNumber(
-                  forecast.absolute_prediction_error
-                )}{' '}
-                streams.
-              </p>
+                  <div>
+                    <p className="intelligence-insight-kicker">
+                      PMIP Interpretation
+                    </p>
+
+                    <h3>
+                      What does this forecast mean?
+                    </h3>
+                  </div>
+
+
+                  <span className="intelligence-insight-badge">
+                    {Number(
+                      forecast.high_forecast_review_flag
+                    ) === 1
+                      ? 'Review Recommended'
+                      : 'No Review Flag'}
+                  </span>
+
+                </div>
+
+
+                <p className="intelligence-insight-text">
+                  PMIP expected{' '}
+
+                  <strong>
+                    {forecast.track_name ||
+                      'the selected track'}
+                  </strong>
+
+                  {' '}to receive approximately{' '}
+
+                  <strong>
+                    {formatNumber(
+                      forecast.predicted_spotify_streams
+                    )}
+                  </strong>
+
+                  {' '}Spotify streams. The track actually received{' '}
+
+                  <strong>
+                    {formatNumber(
+                      forecast.actual_spotify_streams
+                    )}
+                  </strong>
+
+                  {' '}streams.
+                </p>
+
+
+                <div className="intelligence-driver-card">
+
+                  <span>
+                    Prediction difference
+                  </span>
+
+                  <strong>
+                    {formatNumber(
+                      forecast.absolute_prediction_error
+                    )} streams
+                  </strong>
+
+                  <p>
+                    This shows how far PMIP&apos;s prediction was
+                    from the actual stream total. A smaller
+                    difference means the forecast was closer to
+                    the real result.
+                  </p>
+
+                </div>
+
+
+                <div className="intelligence-driver-card intelligence-driver-card-spaced">
+
+                  <span>
+                    Review status
+                  </span>
+
+                  <strong>
+                    {Number(
+                      forecast.high_forecast_review_flag
+                    ) === 1
+                      ? 'Review Recommended'
+                      : 'No Review Flag'}
+                  </strong>
+
+                  <p>
+                    {Number(
+                      forecast.high_forecast_review_flag
+                    ) === 1
+                      ? 'The difference between the prediction and the actual result was large enough for PMIP to recommend a closer look.'
+                      : 'The difference was not large enough for PMIP to recommend additional review.'}
+                  </p>
+
+                </div>
+
+              </div>
+
             </>
           )}
 
@@ -661,11 +879,17 @@ function IntelligencePage() {
           Track anomaly intelligence
       ======================================================== */}
 
-      <ContentSection title="Track Anomaly Intelligence">
+      <ContentSection
+        title="Track Anomaly Intelligence"
+        eyebrow="Anomalies"
+        variant="intelligence"
+      >
 
         <p>
-          Track anomalies highlight unusual streaming observations
-          identified by the PMIP anomaly-detection model.
+          Track anomalies show moments when a track&apos;s streaming
+          activity looks noticeably different from its usual or
+          expected behaviour. PMIP highlights these changes so they
+          can be investigated more closely.
         </p>
 
         <br />
@@ -681,149 +905,208 @@ function IntelligencePage() {
         </button>
 
 
-        {/* Track anomaly loading */}
-
         {trackAnomaliesLoading && (
-          <>
-            <br />
-
-            <p>
-              Loading track anomaly intelligence...
-            </p>
-          </>
+          <p className="intelligence-state-message">
+            Loading track anomaly intelligence...
+          </p>
         )}
 
 
-        {/* Track anomaly error */}
-
         {!trackAnomaliesLoading &&
           trackAnomaliesError && (
-            <>
-              <br />
-
-              <p>
-                {trackAnomaliesError}
-              </p>
-            </>
+            <p className="intelligence-state-message intelligence-state-error">
+              {trackAnomaliesError}
+            </p>
           )}
 
-
-        {/* Track anomaly empty state */}
 
         {trackAnomaliesLoaded &&
           !trackAnomaliesLoading &&
           !trackAnomaliesError &&
           trackAnomalies.length === 0 && (
-            <>
-              <br />
-
-              <p>
-                No track anomalies were found.
-              </p>
-            </>
+            <p className="intelligence-state-message">
+              No unusual track activity was found.
+            </p>
           )}
 
-
-        {/* Track anomaly results */}
 
         {!trackAnomaliesLoading &&
           !trackAnomaliesError &&
           trackAnomalies.length > 0 && (
             <>
-              <br />
 
               <TrackAnomalyChart
                 anomalies={trackAnomalies}
               />
 
-              <br />
 
-              {trackAnomalies.map(
-                (anomaly) => (
-                  <div
-                    key={anomaly.anomaly_result_id}
-                  >
-                    <h3>
-                      {anomaly.track_name ||
-                        `Track ${anomaly.track_id}`}
-                    </h3>
+              <div className="anomaly-results-list">
 
-                    <SummaryCard
-                      label="Anomaly Severity"
-                      value={
-                        anomaly.anomaly_severity ||
-                        'Not available'
-                      }
-                    />
+                {trackAnomalies.map(
+                  (anomaly) => (
+                    <article
+                      className="anomaly-result-card"
+                      key={anomaly.anomaly_result_id}
+                    >
 
-                    <SummaryCard
-                      label="Anomaly Direction"
-                      value={
-                        anomaly.anomaly_direction ||
-                        'Not available'
-                      }
-                    />
+                      <div className="anomaly-result-header">
 
-                    <SummaryCard
-                      label="Streams"
-                      value={
-                        formatNumber(
-                          anomaly.streams
-                        )
-                      }
-                    />
+                        <div>
+                          <p className="anomaly-result-kicker">
+                            Track Anomaly
+                          </p>
 
-                    <SummaryCard
-                      label="Chart Position"
-                      value={
-                        anomaly.chart_position ??
-                        'Not available'
-                      }
-                    />
+                          <h3>
+                            {anomaly.track_name ||
+                              `Track ${anomaly.track_id}`}
+                          </h3>
+                        </div>
 
-                    <SummaryCard
-                      label="Anomaly Score Ratio"
-                      value={
-                        formatNumber(
-                          anomaly.anomaly_score_ratio
-                        )
-                      }
-                    />
 
-                    <p>
-                      <strong>
-                        Observation date:
-                      </strong>{' '}
-                      {formatDate(
-                        anomaly.observation_date
-                      )}
-                    </p>
+                        <span className="anomaly-severity-badge">
+                          {anomaly.anomaly_severity ||
+                            'Not available'}
+                        </span>
 
-                    <p>
-                      <strong>
-                        Country ID:
-                      </strong>{' '}
-                      {anomaly.country_id ??
-                        'Not available'}
-                    </p>
+                      </div>
 
-                    <h4>
-                      What does this mean?
-                    </h4>
 
-                    <p>
-                      PMIP identified this observation as unusual.
-                      The anomaly was classified as{' '}
-                      {anomaly.anomaly_severity ||
-                        'an unavailable severity'} with a{' '}
-                      {anomaly.anomaly_direction ||
-                        'currently unavailable'} direction.
-                    </p>
+                      <div className="anomaly-metric-grid">
 
-                    <hr />
-                  </div>
-                )
-              )}
+                        <SummaryCard
+                          label="Anomaly Severity"
+                          value={
+                            anomaly.anomaly_severity ||
+                            'Not available'
+                          }
+                          helperText="Shows how unusual the detected activity was. A stronger severity means the observation differed more noticeably from expected behaviour."
+                        />
+
+
+                        <SummaryCard
+                          label="Direction"
+                          value={
+                            anomaly.anomaly_direction ||
+                            'Not available'
+                          }
+                          helperText="Shows whether the unusual activity moved above or below the track's expected performance."
+                        />
+
+
+                        <SummaryCard
+                          label="Streams"
+                          value={
+                            formatNumber(
+                              anomaly.streams
+                            )
+                          }
+                          helperText="The number of streams recorded for this observation."
+                        />
+
+
+                        <SummaryCard
+                          label="Chart Position"
+                          value={
+                            anomaly.chart_position ??
+                            'Not available'
+                          }
+                          helperText="The track's chart position when this unusual activity was recorded."
+                        />
+
+
+                        <SummaryCard
+                          label="Anomaly Score"
+                          value={
+                            formatNumber(
+                              anomaly.anomaly_score_ratio
+                            )
+                          }
+                          helperText="Shows how strongly this observation differs from what PMIP expected. Higher values indicate more unusual behaviour."
+                          tone="highlight"
+                        />
+
+                      </div>
+
+
+                      <div className="anomaly-metadata">
+
+                        <div className="anomaly-metadata-item">
+                          <span>
+                            Observation date
+                          </span>
+
+                          <strong>
+                            {formatDate(
+                              anomaly.observation_date
+                            )}
+                          </strong>
+                        </div>
+
+
+                        <div className="anomaly-metadata-item">
+                          <span>
+                            Market
+                          </span>
+
+                          <strong>
+                            {anomaly.country_name ||
+                              anomaly.source_country ||
+                              (
+                                anomaly.country_id
+                                  ? `Country ${anomaly.country_id}`
+                                  : 'Not available'
+                              )}
+                          </strong>
+                        </div>
+
+                      </div>
+
+
+                      <div className="anomaly-interpretation">
+
+                        <p className="intelligence-insight-kicker">
+                          PMIP Interpretation
+                        </p>
+
+                        <h4>
+                          What does this mean?
+                        </h4>
+
+
+                        <p>
+                          PMIP found that this streaming observation
+                          was noticeably different from the
+                          track&apos;s expected behaviour.
+                        </p>
+
+
+                        <p>
+                          The unusual activity was rated as{' '}
+
+                          <strong>
+                            {anomaly.anomaly_severity ||
+                              'Not available'}
+                          </strong>
+
+                          {' '}in severity. Its direction was{' '}
+
+                          <strong>
+                            {anomaly.anomaly_direction ||
+                              'Not available'}
+                          </strong>
+
+                          , showing whether the activity moved above
+                          or below the expected level.
+                        </p>
+
+                      </div>
+
+                    </article>
+                  )
+                )}
+
+              </div>
+
             </>
           )}
 
@@ -834,12 +1117,17 @@ function IntelligencePage() {
           Artist anomaly summaries
       ======================================================== */}
 
-      <ContentSection title="Artist Anomaly Summary">
+      <ContentSection
+        title="Artist Anomaly Summary"
+        eyebrow="Artist Anomalies"
+        variant="intelligence"
+      >
 
         <p>
-          Artist anomaly summaries combine unusual streaming
-          observations to provide a higher-level view of anomaly
-          activity for each artist.
+          This summary shows how often unusual streaming activity
+          appears across an artist&apos;s analysed observations.
+          It helps highlight artists whose recent data may deserve
+          closer attention.
         </p>
 
         <br />
@@ -855,183 +1143,280 @@ function IntelligencePage() {
         </button>
 
 
-        {/* Artist anomaly loading */}
-
         {artistAnomaliesLoading && (
-          <>
-            <br />
-
-            <p>
-              Loading artist anomaly intelligence...
-            </p>
-          </>
+          <p className="intelligence-state-message">
+            Loading artist anomaly intelligence...
+          </p>
         )}
 
 
-        {/* Artist anomaly error */}
-
         {!artistAnomaliesLoading &&
           artistAnomaliesError && (
-            <>
-              <br />
-
-              <p>
-                {artistAnomaliesError}
-              </p>
-            </>
+            <p className="intelligence-state-message intelligence-state-error">
+              {artistAnomaliesError}
+            </p>
           )}
 
-
-        {/* Artist anomaly empty state */}
 
         {artistAnomaliesLoaded &&
           !artistAnomaliesLoading &&
           !artistAnomaliesError &&
           artistAnomalies.length === 0 && (
-            <>
-              <br />
-
-              <p>
-                No artist anomaly summaries were found.
-              </p>
-            </>
+            <p className="intelligence-state-message">
+              No unusual artist activity was found.
+            </p>
           )}
 
-
-        {/* Artist anomaly results */}
 
         {!artistAnomaliesLoading &&
           !artistAnomaliesError &&
           artistAnomalies.length > 0 && (
             <>
-              <br />
 
               <ArtistAnomalyChart
                 artists={artistAnomalies}
               />
 
-              <br />
 
-              {artistAnomalies.map(
-                (artist) => (
-                  <div
-                    key={artist.artist_id}
-                  >
-                    <h3>
-                      {artist.artist_name ||
-                        `Artist ${artist.artist_id}`}
-                    </h3>
+              <div className="artist-anomaly-results-list">
 
-                    <SummaryCard
-                      label="Total Observations"
-                      value={
-                        formatNumber(
-                          artist.total_observations
-                        )
-                      }
-                    />
+                {artistAnomalies.map(
+                  (artist) => (
+                    <article
+                      className="artist-anomaly-result-card"
+                      key={artist.artist_id}
+                    >
 
-                    <SummaryCard
-                      label="Detected Anomalies"
-                      value={
-                        formatNumber(
-                          artist.final_anomaly_count
-                        )
-                      }
-                    />
+                      {/* ==========================================
+                          Artist heading
+                      ========================================== */}
 
-                    <SummaryCard
-                      label="High-Priority Anomalies"
-                      value={
-                        formatNumber(
-                          artist.high_priority_anomaly_count
-                        )
-                      }
-                    />
+                      <div className="artist-anomaly-result-header">
 
-                    <SummaryCard
-                      label="Extreme Anomalies"
-                      value={
-                        formatNumber(
-                          artist.extreme_anomaly_count
-                        )
-                      }
-                    />
+                        <div>
+                          <p className="anomaly-result-kicker">
+                            Artist Anomaly Summary
+                          </p>
 
-                    <SummaryCard
-                      label="Positive Anomalies"
-                      value={
-                        formatNumber(
-                          artist.positive_anomaly_count
-                        )
-                      }
-                    />
+                          <h3>
+                            {artist.artist_name ||
+                              `Artist ${artist.artist_id}`}
+                          </h3>
+                        </div>
 
-                    <SummaryCard
-                      label="Negative Anomalies"
-                      value={
-                        formatNumber(
-                          artist.negative_anomaly_count
-                        )
-                      }
-                    />
 
-                    <SummaryCard
-                      label="Anomaly Rate"
-                      value={
-                        `${formatNumber(
-                          artist.anomaly_rate_pct
-                        )}%`
-                      }
-                    />
+                        <div className="artist-anomaly-rate-badge">
 
-                    <SummaryCard
-                      label="Artist Review Score"
-                      value={
-                        formatNumber(
-                          artist.artist_review_score
-                        )
-                      }
-                    />
+                          <span>
+                            Anomaly Rate
+                          </span>
 
-                    <p>
-                      <strong>
-                        Latest observation:
-                      </strong>{' '}
-                      {formatDate(
-                        artist.latest_observation_date
-                      )}
-                    </p>
+                          <strong>
+                            {formatNumber(
+                              artist.anomaly_rate_pct
+                            )}%
+                          </strong>
 
-                    <h4>
-                      What does this mean?
-                    </h4>
+                        </div>
 
-                    <p>
-                      PMIP detected{' '}
-                      {formatNumber(
-                        artist.final_anomaly_count
-                      )}{' '}
-                      unusual observations across{' '}
-                      {formatNumber(
-                        artist.total_observations
-                      )}{' '}
-                      analysed observations for{' '}
-                      {artist.artist_name ||
-                        `Artist ${artist.artist_id}`}.
-                    </p>
+                      </div>
 
-                    <p>
-                      The overall anomaly rate was approximately{' '}
-                      {formatNumber(
-                        artist.anomaly_rate_pct
-                      )}%.
-                    </p>
 
-                    <hr />
-                  </div>
-                )
-              )}
+                      {/* ==========================================
+                          Main metrics
+                      ========================================== */}
+
+                      <div className="artist-anomaly-metric-grid">
+
+                        <SummaryCard
+                          label="Total Observations"
+                          value={
+                            formatNumber(
+                              artist.total_observations
+                            )
+                          }
+                          helperText="The total number of artist observations checked by PMIP."
+                        />
+
+
+                        <SummaryCard
+                          label="Detected Anomalies"
+                          value={
+                            formatNumber(
+                              artist.final_anomaly_count
+                            )
+                          }
+                          helperText="The number of observations that PMIP identified as unusually different from expected behaviour."
+                          tone="highlight"
+                        />
+
+
+                        <SummaryCard
+                          label="High-Priority"
+                          value={
+                            formatNumber(
+                              artist.high_priority_anomaly_count
+                            )
+                          }
+                          helperText="The number of unusual observations that PMIP considers important enough for closer review."
+                        />
+
+
+                        <SummaryCard
+                          label="Extreme"
+                          value={
+                            formatNumber(
+                              artist.extreme_anomaly_count
+                            )
+                          }
+                          helperText="The number of observations showing the strongest unusual behaviour."
+                        />
+
+
+                        <SummaryCard
+                          label="Positive"
+                          value={
+                            formatNumber(
+                              artist.positive_anomaly_count
+                            )
+                          }
+                          helperText="Unusual observations where activity moved above the expected level."
+                        />
+
+
+                        <SummaryCard
+                          label="Negative"
+                          value={
+                            formatNumber(
+                              artist.negative_anomaly_count
+                            )
+                          }
+                          helperText="Unusual observations where activity moved below the expected level."
+                        />
+
+
+                        <SummaryCard
+                          label="Review Score"
+                          value={
+                            formatNumber(
+                              artist.artist_review_score
+                            )
+                          }
+                          helperText="A PMIP score used to help show how strongly this artist may need further review."
+                        />
+
+                      </div>
+
+
+                      {/* ==========================================
+                          Metadata
+                      ========================================== */}
+
+                      <div className="anomaly-metadata">
+
+                        <div className="anomaly-metadata-item">
+                          <span>
+                            Latest observation
+                          </span>
+
+                          <strong>
+                            {formatDate(
+                              artist.latest_observation_date
+                            )}
+                          </strong>
+                        </div>
+
+
+                        <div className="anomaly-metadata-item">
+                          <span>
+                            Overall anomaly rate
+                          </span>
+
+                          <strong>
+                            {formatNumber(
+                              artist.anomaly_rate_pct
+                            )}%
+                          </strong>
+                        </div>
+
+                      </div>
+
+
+                      {/* ==========================================
+                          Interpretation
+                      ========================================== */}
+
+                      <div className="anomaly-interpretation">
+
+                        <p className="intelligence-insight-kicker">
+                          PMIP Interpretation
+                        </p>
+
+                        <h4>
+                          What does this mean?
+                        </h4>
+
+
+                        <p>
+                          PMIP analysed{' '}
+
+                          <strong>
+                            {formatNumber(
+                              artist.total_observations
+                            )}
+                          </strong>
+
+                          {' '}observations for{' '}
+
+                          <strong>
+                            {artist.artist_name ||
+                              `Artist ${artist.artist_id}`}
+                          </strong>
+
+                          {' '}and found{' '}
+
+                          <strong>
+                            {formatNumber(
+                              artist.final_anomaly_count
+                            )}
+                          </strong>
+
+                          {' '}that were unusually different from
+                          the expected pattern.
+                        </p>
+
+
+                        <p>
+                          The artist&apos;s anomaly rate is{' '}
+
+                          <strong>
+                            {formatNumber(
+                              artist.anomaly_rate_pct
+                            )}%
+                          </strong>
+
+                          . This means that this percentage of the
+                          analysed observations was identified as
+                          unusual by PMIP.
+                        </p>
+
+
+                        <p>
+                          Positive anomalies show unusual increases
+                          in activity, while negative anomalies show
+                          unusual decreases. High-priority and
+                          extreme counts highlight the observations
+                          that may deserve the closest attention.
+                        </p>
+
+                      </div>
+
+                    </article>
+                  )
+                )}
+
+              </div>
+
             </>
           )}
 

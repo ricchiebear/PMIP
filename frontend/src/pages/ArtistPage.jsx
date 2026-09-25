@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/common/PageHeader';
-import ContentSection from '../components/common/ContentSection';
 
 import {
   searchArtists
@@ -93,105 +92,192 @@ function ArtistPage() {
   return (
     <PageContainer>
 
-      {/* Page heading */}
+      {/* ========================================================
+          Page header
+      ======================================================== */}
 
       <PageHeader
         title="Artists"
-        description="Search and explore artist analytics."
+        description="Search artists and explore their profiles, performance and PMIP intelligence."
       />
 
 
       {/* ========================================================
-          Artist search
+          Artist search panel
       ======================================================== */}
 
-      <ContentSection title="Artist Search">
+      <section className="artist-search-panel">
 
-        <form onSubmit={handleSubmit}>
+        <div className="artist-search-copy">
+          <p className="artist-search-kicker">
+            Artist Discovery
+          </p>
 
-          <label htmlFor="artist-search">
+          <h2>
+            Find an Artist
+          </h2>
+
+          <p>
+            Search by artist name to open a profile and explore
+            available momentum, growth and performance intelligence.
+          </p>
+        </div>
+
+
+        <form
+          className="artist-search-form"
+          onSubmit={handleSubmit}
+        >
+          <label
+            htmlFor="artist-search"
+            className="artist-search-label"
+          >
             Artist name
           </label>
 
-          <br />
+          <div className="artist-search-controls">
 
-          <input
-            id="artist-search"
-            type="text"
-            value={query}
-            onChange={(event) =>
-              setQuery(
-                event.target.value
-              )
-            }
-            placeholder="Search for an artist..."
-          />
+            <input
+              id="artist-search"
+              type="text"
+              value={query}
+              onChange={(event) =>
+                setQuery(
+                  event.target.value
+                )
+              }
+              placeholder="Search for an artist..."
+              className={
+                error && !query.trim()
+                  ? 'artist-search-input artist-search-input-error'
+                  : 'artist-search-input'
+              }
+            />
 
-          <br />
-          <br />
+            <button
+              type="submit"
+              disabled={loading}
+              className="artist-search-button"
+            >
+              {loading
+                ? 'Searching...'
+                : 'Search Artists'}
+            </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading
-              ? 'Searching...'
-              : 'Search'}
-          </button>
+          </div>
+
+
+          {/* Validation / API error */}
+
+          {error && (
+            <p className="artist-search-error">
+              {error}
+            </p>
+          )}
 
         </form>
 
-
-        {/* Search error */}
-
-        {error && (
-          <>
-            <br />
-
-            <p>
-              {error}
-            </p>
-          </>
-        )}
-
-      </ContentSection>
+      </section>
 
 
       {/* ========================================================
           Search results
       ======================================================== */}
 
-      <ContentSection title="Search Results">
+      <section className="artist-results-section">
+
+        <div className="artist-results-heading">
+          <div>
+            <p className="artist-search-kicker">
+              Results
+            </p>
+
+            <h2>
+              Search Results
+            </h2>
+          </div>
+
+          {!loading &&
+            !error &&
+            artists.length > 0 && (
+              <p className="artist-results-count">
+                {artists.length}{' '}
+                {artists.length === 1
+                  ? 'artist found'
+                  : 'artists found'}
+              </p>
+            )}
+        </div>
+
 
         {/* Before first search */}
 
         {!hasSearched &&
           !loading &&
           !error && (
-            <p>
-              Search results will appear here.
-            </p>
+            <div className="artist-state-card">
+              <span
+                className="artist-state-icon"
+                aria-hidden="true"
+              >
+                ◉
+              </span>
+
+              <h3>
+                Start with an Artist Name
+              </h3>
+
+              <p>
+                Search results will appear here after you enter an
+                artist name.
+              </p>
+            </div>
           )}
 
 
         {/* Loading state */}
 
         {loading && (
-          <p>
-            Searching for artists...
-          </p>
+          <div className="artist-state-card">
+            <div
+              className="artist-loading-spinner"
+              aria-hidden="true"
+            />
+
+            <h3>
+              Searching PMIP
+            </h3>
+
+            <p>
+              Looking for artists matching "{searchedQuery}".
+            </p>
+          </div>
         )}
 
 
-        {/* Empty search result */}
+        {/* Empty state */}
 
         {hasSearched &&
           !loading &&
           !error &&
           artists.length === 0 && (
-            <p>
-              No artists were found for "{searchedQuery}".
-            </p>
+            <div className="artist-state-card">
+              <span
+                className="artist-state-icon"
+                aria-hidden="true"
+              >
+                ◌
+              </span>
+
+              <h3>
+                No Artists Found
+              </h3>
+
+              <p>
+                No artists were found for "{searchedQuery}".
+                Try another spelling or a different artist name.
+              </p>
+            </div>
           )}
 
 
@@ -200,40 +286,62 @@ function ArtistPage() {
         {!loading &&
           !error &&
           artists.length > 0 && (
-            <>
-              <p>
-                Found {artists.length}{' '}
-                {artists.length === 1
-                  ? 'artist'
-                  : 'artists'}.
-              </p>
+            <div className="artist-results-grid">
 
               {artists.map((artist) => (
-                <div
+                <article
                   key={artist.artist_id}
+                  className="artist-result-card"
                 >
-                  <h3>
-                    <Link
-                      to={`/artists/${artist.artist_id}`}
+                  <div className="artist-result-card-top">
+
+                    <div
+                      className="artist-result-avatar"
+                      aria-hidden="true"
                     >
-                      {artist.artist_name}
-                    </Link>
-                  </h3>
+                      {artist.artist_name
+                        ?.trim()
+                        ?.charAt(0)
+                        ?.toUpperCase() || 'A'}
+                    </div>
 
-                  <p>
+                    <div>
+                      <p className="artist-result-type">
+                        Artist
+                      </p>
+
+                      <h3>
+                        {artist.artist_name}
+                      </h3>
+                    </div>
+
+                  </div>
+
+
+                  <div className="artist-result-meta">
+                    <span>
+                      PMIP Artist ID
+                    </span>
+
                     <strong>
-                      Artist ID:
-                    </strong>{' '}
-                    {artist.artist_id}
-                  </p>
+                      {artist.artist_id}
+                    </strong>
+                  </div>
 
-                  <hr />
-                </div>
+
+                  <Link
+                    to={`/artists/${artist.artist_id}`}
+                    className="artist-result-action"
+                  >
+                    View Artist Profile →
+                  </Link>
+                </article>
               ))}
-            </>
+
+            </div>
           )}
 
-      </ContentSection>
+      </section>
 
     </PageContainer>
   );

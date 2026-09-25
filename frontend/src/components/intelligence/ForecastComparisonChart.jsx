@@ -5,7 +5,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts';
 
@@ -15,7 +14,10 @@ function ForecastComparisonChart({
   predictedStreams,
   actualStreams
 }) {
+  // ============================================================
   // Prepare values
+  // ============================================================
+
   const predicted = Number(predictedStreams);
   const actual = Number(actualStreams);
 
@@ -24,52 +26,192 @@ function ForecastComparisonChart({
     Number.isNaN(actual)
   ) {
     return (
-      <p>
-        Forecast comparison data is not available for this chart.
-      </p>
+      <div className="intelligence-chart-empty">
+        <p>
+          Forecast comparison data is not available for this track.
+        </p>
+      </div>
     );
   }
 
 
+  // ============================================================
   // Prepare chart data
+  // ============================================================
+
   const chartData = [
     {
       type: 'Predicted',
-      streams: predicted
+      predicted,
+      actual: null
     },
     {
       type: 'Actual',
-      streams: actual
+      predicted: null,
+      actual
     }
   ];
 
 
-  // Format large stream values
+  // ============================================================
+  // Format large values
+  // ============================================================
+
   function formatCompactNumber(value) {
-    return new Intl.NumberFormat('en-GB', {
-      notation: 'compact',
-      maximumFractionDigits: 1
-    }).format(Number(value));
+    return new Intl.NumberFormat(
+      'en-GB',
+      {
+        notation: 'compact',
+        maximumFractionDigits: 1
+      }
+    ).format(Number(value));
   }
 
 
+  function formatFullNumber(value) {
+    return Number(value).toLocaleString(
+      'en-GB',
+      {
+        maximumFractionDigits: 0
+      }
+    );
+  }
+
+
+  // ============================================================
+  // Custom tooltip
+  // ============================================================
+
+  function ForecastTooltip({
+    active,
+    payload,
+    label
+  }) {
+    if (
+      !active ||
+      !payload ||
+      payload.length === 0
+    ) {
+      return null;
+    }
+
+    const validEntry =
+      payload.find(
+        (entry) =>
+          entry.value !== null &&
+          entry.value !== undefined
+      );
+
+    if (!validEntry) {
+      return null;
+    }
+
+    return (
+      <div className="pmip-chart-tooltip">
+
+        <p className="pmip-chart-tooltip-label">
+          {trackName || 'Selected track'}
+        </p>
+
+        <span className="pmip-chart-tooltip-category">
+          {label}
+        </span>
+
+        <p className="pmip-chart-tooltip-value">
+          {formatFullNumber(
+            validEntry.value
+          )}
+        </p>
+
+        <span>
+          Spotify Streams
+        </span>
+
+      </div>
+    );
+  }
+
+
+  // ============================================================
+  // Difference
+  // ============================================================
+
+  const difference =
+    Math.abs(
+      actual - predicted
+    );
+
+
+  // ============================================================
   // Chart
+  // ============================================================
+
   return (
-    <div>
-      <h3>Predicted vs Actual Spotify Streams</h3>
+    <div className="intelligence-chart-card">
 
-      <p>
-        This chart compares PMIP&apos;s predicted Spotify stream
-        total with the observed stream total for{' '}
-        {trackName || 'the selected track'}.
-      </p>
+      <div className="intelligence-chart-header">
 
-      <div
-        style={{
-          width: '100%',
-          height: '380px'
-        }}
-      >
+        <div>
+          <p className="intelligence-chart-kicker">
+            Forecast Visualisation
+          </p>
+
+          <h3>
+            Predicted vs Actual Spotify Streams
+          </h3>
+
+          <p className="intelligence-chart-description">
+            Compare PMIP&apos;s predicted stream total with the
+            observed performance for{' '}
+            {trackName || 'the selected track'}.
+          </p>
+        </div>
+
+
+        <div className="intelligence-chart-score forecast-difference-card">
+
+          <span>
+            Difference
+          </span>
+
+          <strong>
+            {formatCompactNumber(
+              difference
+            )}
+          </strong>
+
+          <small>
+            streams
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div className="forecast-chart-legend">
+
+        <div className="forecast-legend-item">
+          <span className="forecast-legend-dot forecast-legend-predicted" />
+
+          <span>
+            Predicted Streams
+          </span>
+        </div>
+
+        <div className="forecast-legend-item">
+          <span className="forecast-legend-dot forecast-legend-actual" />
+
+          <span>
+            Actual Streams
+          </span>
+        </div>
+
+      </div>
+
+
+      <div className="forecast-chart-container">
+
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -78,56 +220,79 @@ function ForecastComparisonChart({
             data={chartData}
             margin={{
               top: 20,
-              right: 30,
-              left: 70,
-              bottom: 50
+              right: 20,
+              left: 20,
+              bottom: 10
             }}
           >
+
             <CartesianGrid
+              stroke="#334155"
               strokeDasharray="3 3"
+              vertical={false}
             />
+
 
             <XAxis
               dataKey="type"
-              label={{
-                value: 'Forecast Comparison',
-                position: 'insideBottom',
-                offset: -20
+              tick={{
+                fill: '#9CA3AF',
+                fontSize: 12
               }}
+              axisLine={{
+                stroke: '#334155'
+              }}
+              tickLine={false}
             />
+
 
             <YAxis
-              width={90}
-              tickFormatter={formatCompactNumber}
-              label={{
-                value: 'Spotify Streams',
-                angle: -90,
-                position: 'insideLeft',
-                offset: -50
+              width={72}
+              tickFormatter={
+                formatCompactNumber
+              }
+              tick={{
+                fill: '#9CA3AF',
+                fontSize: 12
               }}
+              axisLine={false}
+              tickLine={false}
             />
+
 
             <Tooltip
-              formatter={(value) => [
-                Number(value).toLocaleString(),
-                'Spotify Streams'
-              ]}
+              cursor={{
+                fill: 'rgba(124, 58, 237, 0.06)'
+              }}
+              content={<ForecastTooltip />}
             />
 
-            <Legend
-              verticalAlign="top"
-              height={36}
-            />
 
             <Bar
-              dataKey="streams"
-              name="Spotify Streams"
+              dataKey="predicted"
+              name="Predicted Streams"
+              fill="#7C3AED"
+              radius={[8, 8, 0, 0]}
+              barSize={80}
             />
+
+
+            <Bar
+              dataKey="actual"
+              name="Actual Streams"
+              fill="#A855F7"
+              radius={[8, 8, 0, 0]}
+              barSize={80}
+            />
+
           </BarChart>
         </ResponsiveContainer>
+
       </div>
+
     </div>
   );
 }
+
 
 export default ForecastComparisonChart;

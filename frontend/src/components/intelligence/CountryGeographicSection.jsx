@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import ContentSection from '../common/ContentSection';
 import SummaryCard from '../common/SummaryCard';
@@ -8,7 +8,14 @@ import {
   getCountryGeographicIntelligence
 } from '../../services/intelligenceService';
 
-function CountryGeographicSection() {
+import {
+  getCountryName
+} from '../../utils/countryNames';
+
+
+function CountryGeographicSection({
+  selectedCountryCode = ''
+}) {
   // ============================================================
   // Data
   // ============================================================
@@ -28,24 +35,108 @@ function CountryGeographicSection() {
 
 
   // ============================================================
+  // Selected country
+  // ============================================================
+
+  const selectedCountryName =
+    selectedCountryCode
+      ? getCountryName(
+          selectedCountryCode,
+          selectedCountryCode
+        )
+      : '';
+
+
+  // ============================================================
+  // Country matching
+  // ============================================================
+
+  function countryMatchesSelection(country) {
+    if (!selectedCountryCode) {
+      return true;
+    }
+
+    const selectedCode =
+      selectedCountryCode
+        .trim()
+        .toLowerCase();
+
+    const selectedName =
+      selectedCountryName
+        .trim()
+        .toLowerCase();
+
+    const countryCode =
+      String(
+        country.country_code ||
+        country.source_country ||
+        ''
+      )
+        .trim()
+        .toLowerCase();
+
+    const countryName =
+      String(
+        country.country_name ||
+        country.source_country ||
+        ''
+      )
+        .trim()
+        .toLowerCase();
+
+    const formattedCountryName =
+      getCountryName(
+        country.country_name ||
+        country.source_country,
+        country.country_code ||
+        country.source_country
+      )
+        .trim()
+        .toLowerCase();
+
+    return (
+      countryCode === selectedCode ||
+      countryName === selectedCode ||
+      countryName === selectedName ||
+      formattedCountryName === selectedName
+    );
+  }
+
+
+  // ============================================================
   // Load country geographic intelligence
   // ============================================================
 
-  async function handleLoadCountries() {
+  async function loadCountries() {
     try {
       setLoading(true);
       setError('');
       setCountries([]);
       setHasLoaded(false);
 
+      const limit =
+        selectedCountryCode
+          ? 100
+          : 5;
+
       const result =
         await getCountryGeographicIntelligence(
           1,
-          5
+          limit
         );
 
+      const results =
+        result.data || [];
+
+      const filteredCountries =
+        selectedCountryCode
+          ? results.filter(
+              countryMatchesSelection
+            )
+          : results;
+
       setCountries(
-        result.data || []
+        filteredCountries
       );
 
       setHasLoaded(true);
@@ -53,7 +144,8 @@ function CountryGeographicSection() {
       setCountries([]);
 
       setError(
-        error.message
+        error.message ||
+        'Unable to load country geographic intelligence.'
       );
 
       setHasLoaded(true);
@@ -61,6 +153,26 @@ function CountryGeographicSection() {
       setLoading(false);
     }
   }
+
+
+  // ============================================================
+  // Manual load
+  // ============================================================
+
+  async function handleLoadCountries() {
+    await loadCountries();
+  }
+
+
+  // ============================================================
+  // Automatic selected-country load
+  // ============================================================
+
+  useEffect(() => {
+    if (selectedCountryCode) {
+      loadCountries();
+    }
+  }, [selectedCountryCode]);
 
 
   // ============================================================
@@ -76,7 +188,13 @@ function CountryGeographicSection() {
       return 'Not available';
     }
 
-    return Number(value).toLocaleString(
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+      return 'Not available';
+    }
+
+    return number.toLocaleString(
       undefined,
       {
         maximumFractionDigits: 2
@@ -86,165 +204,306 @@ function CountryGeographicSection() {
 
 
   // ============================================================
+  // Country label
+  // ============================================================
+
+  function getCountryLabel(country) {
+    return getCountryName(
+      country.country_name ||
+      country.source_country,
+      country.country_code ||
+      country.source_country
+    );
+  }
+
+
+  // ============================================================
   // Section
   // ============================================================
 
   return (
-    <ContentSection title="Country Geographic Performance">
+    <ContentSection
+      title={
+        selectedCountryName
+          ? `${selectedCountryName} Geographic Performance`
+          : 'Country Geographic Performance'
+      }
+      eyebrow="Geographic Intelligence"
+      variant="intelligence"
+    >
 
       <p>
-        Explore how countries perform across streaming strength,
-        chart performance and overall market importance.
+        {selectedCountryName
+          ? `See how ${selectedCountryName} performs based on its streaming activity, chart results and overall market strength.`
+          : 'Compare how different countries perform based on streaming activity, chart results and overall market strength.'}
       </p>
 
-      <br />
 
-      <button
-        type="button"
-        onClick={handleLoadCountries}
-        disabled={loading}
-      >
-        {loading
-          ? 'Loading...'
-          : 'Load Country Geographic Intelligence'}
-      </button>
-
-
-      {/* Error state */}
-
-      {error && (
+      {!selectedCountryCode && (
         <>
           <br />
 
-          <p>
-            {error}
-          </p>
+          <button
+            type="button"
+            onClick={handleLoadCountries}
+            disabled={loading}
+          >
+            {loading
+              ? 'Loading...'
+              : 'Load Country Geographic Intelligence'}
+          </button>
         </>
       )}
 
 
-      {/* Empty state */}
+      {/* ========================================================
+          Loading state
+      ======================================================== */}
 
-      {hasLoaded &&
-        !error &&
-        countries.length === 0 && (
-          <>
-            <br />
+      {loading && (
+        <p className="intelligence-state-message">
+          {selectedCountryName
+            ? `Loading geographic intelligence for ${selectedCountryName}...`
+            : 'Loading country geographic intelligence...'}
+        </p>
+      )}
 
-            <p>
-              No country geographic intelligence was found.
-            </p>
-          </>
+
+      {/* ========================================================
+          Error state
+      ======================================================== */}
+
+      {!loading &&
+        error && (
+          <p className="intelligence-state-message intelligence-state-error">
+            {error}
+          </p>
         )}
 
 
-      {/* Results */}
+      {/* ========================================================
+          Empty state
+      ======================================================== */}
 
-      {countries.length > 0 && (
-        <>
-          <br />
+      {hasLoaded &&
+        !loading &&
+        !error &&
+        countries.length === 0 && (
+          <p className="intelligence-state-message">
+            {selectedCountryName
+              ? `No geographic intelligence was found for ${selectedCountryName}.`
+              : 'No country geographic intelligence was found.'}
+          </p>
+        )}
 
-          <CountryGeographicChart
-            countries={countries}
-          />
 
-          <br />
+      {/* ========================================================
+          Results
+      ======================================================== */}
 
-          {countries.map(
-            (country) => (
-              <div
-                key={country.country_geo_result_id}
-              >
-                <h3>
-                  {country.country_name}
-                </h3>
+      {!loading &&
+        !error &&
+        countries.length > 0 && (
+          <>
 
-                <SummaryCard
-                  label="Total Streams"
-                  value={
-                    formatNumber(
-                      country.total_streams
-                    )
-                  }
-                />
+            <CountryGeographicChart
+              countries={countries}
+            />
 
-                <SummaryCard
-                  label="Median Streams"
-                  value={
-                    formatNumber(
-                      country.median_streams
-                    )
-                  }
-                />
 
-                <SummaryCard
-                  label="Mean Streams"
-                  value={
-                    formatNumber(
-                      country.mean_streams
-                    )
-                  }
-                />
+            <div className="geographic-results-list">
 
-                <SummaryCard
-                  label="Median Chart Position"
-                  value={
-                    formatNumber(
-                      country.median_chart_position
-                    )
-                  }
-                />
+              {countries.map(
+                (country) => (
+                  <article
+                    className="geographic-result-card"
+                    key={country.country_geo_result_id}
+                  >
 
-                <SummaryCard
-                  label="Top 10 Rate"
-                  value={
-                    `${formatNumber(
-                      country.top_10_rate_pct
-                    )}%`
-                  }
-                />
+                    {/* ==========================================
+                        Country heading
+                    ========================================== */}
 
-                <SummaryCard
-                  label="Top 50 Rate"
-                  value={
-                    `${formatNumber(
-                      country.top_50_rate_pct
-                    )}%`
-                  }
-                />
+                    <div className="geographic-result-header">
 
-                <SummaryCard
-                  label="Country Findings Index"
-                  value={
-                    country.country_findings_index
-                  }
-                />
+                      <div>
+                        <p className="anomaly-result-kicker">
+                          Market Geographic Profile
+                        </p>
 
-                <SummaryCard
-                  label="Country Classification"
-                  value={
-                    country.country_findings_class
-                  }
-                />
+                        <h3>
+                          {getCountryLabel(country)}
+                        </h3>
+                      </div>
 
-                <h4>
-                  What does this mean?
-                </h4>
 
-                <p>
-                  PMIP classifies this market as{' '}
-                  {country.country_findings_class}.
-                </p>
+                      <span className="geographic-classification-badge">
+                        {country.country_findings_class ||
+                          'Not available'}
+                      </span>
 
-                <hr />
-              </div>
-            )
-          )}
-        </>
-      )}
+                    </div>
+
+
+                    {/* ==========================================
+                        Main metrics
+                    ========================================== */}
+
+                    <div className="geographic-metric-grid">
+
+                      <SummaryCard
+                        label="Total Streams"
+                        value={
+                          formatNumber(
+                            country.total_streams
+                          )
+                        }
+                        helperText="The total number of streams recorded for this market."
+                      />
+
+
+                      <SummaryCard
+                        label="Median Streams"
+                        value={
+                          formatNumber(
+                            country.median_streams
+                          )
+                        }
+                        helperText="The middle streaming value across the observations in this market, which helps reduce the effect of unusually high or low results."
+                      />
+
+
+                      <SummaryCard
+                        label="Mean Streams"
+                        value={
+                          formatNumber(
+                            country.mean_streams
+                          )
+                        }
+                        helperText="The average number of streams across the observations in this market."
+                      />
+
+
+                      <SummaryCard
+                        label="Median Chart Position"
+                        value={
+                          formatNumber(
+                            country.median_chart_position
+                          )
+                        }
+                        helperText="The middle chart position across the market's observations. A smaller number means a stronger chart position."
+                      />
+
+
+                      <SummaryCard
+                        label="Top 10 Rate"
+                        value={
+                          `${formatNumber(
+                            country.top_10_rate_pct
+                          )}%`
+                        }
+                        helperText="The percentage of analysed observations that reached the Top 10."
+                      />
+
+
+                      <SummaryCard
+                        label="Top 50 Rate"
+                        value={
+                          `${formatNumber(
+                            country.top_50_rate_pct
+                          )}%`
+                        }
+                        helperText="The percentage of analysed observations that reached the Top 50."
+                      />
+
+
+                      <SummaryCard
+                        label="Geographic Strength Index"
+                        value={
+                          formatNumber(
+                            country.country_findings_index
+                          )
+                        }
+                        helperText="An overall PMIP score that combines streaming and chart signals to show the strength of this market. Higher values indicate stronger performance."
+                        tone="highlight"
+                      />
+
+
+                      <SummaryCard
+                        label="Classification"
+                        value={
+                          country.country_findings_class ||
+                          'Not available'
+                        }
+                        helperText="A simple category that summarises the market's overall geographic performance."
+                      />
+
+                    </div>
+
+
+                    {/* ==========================================
+                        Interpretation
+                    ========================================== */}
+
+                    <div className="anomaly-interpretation">
+
+                      <p className="intelligence-insight-kicker">
+                        PMIP Interpretation
+                      </p>
+
+                      <h4>
+                        What does this mean?
+                      </h4>
+
+
+                      <p>
+                        PMIP places{' '}
+
+                        <strong>
+                          {getCountryLabel(country)}
+                        </strong>
+
+                        {' '}in the{' '}
+
+                        <strong>
+                          {country.country_findings_class ||
+                            'Not available'}
+                        </strong>
+
+                        {' '}performance category based on a
+                        combination of streaming activity and chart
+                        results.
+                      </p>
+
+
+                      <p>
+                        The market&apos;s Geographic Strength Index is{' '}
+
+                        <strong>
+                          {formatNumber(
+                            country.country_findings_index
+                          )}
+                        </strong>
+
+                        . This score gives a simple overall view of
+                        how strongly the market is performing within
+                        PMIP&apos;s geographic intelligence.
+                      </p>
+
+                    </div>
+
+                  </article>
+                )
+              )}
+
+            </div>
+
+          </>
+        )}
 
     </ContentSection>
   );
 }
+
 
 export default CountryGeographicSection;

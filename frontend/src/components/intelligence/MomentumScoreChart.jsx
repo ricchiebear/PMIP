@@ -5,7 +5,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts';
 
@@ -14,7 +13,10 @@ function MomentumScoreChart({
   artistName,
   score
 }) {
+  // ============================================================
   // Prepare chart data
+  // ============================================================
+
   const numericScore = Number(score);
 
   if (
@@ -23,11 +25,14 @@ function MomentumScoreChart({
     Number.isNaN(numericScore)
   ) {
     return (
-      <p>
-        No momentum score is available for this chart.
-      </p>
+      <div className="intelligence-chart-empty">
+        <p>
+          No momentum score is available for this artist.
+        </p>
+      </div>
     );
   }
+
 
   const chartData = [
     {
@@ -37,23 +42,95 @@ function MomentumScoreChart({
   ];
 
 
+  // ============================================================
+  // Custom tooltip
+  // ============================================================
+
+  function MomentumTooltip({
+    active,
+    payload
+  }) {
+    if (
+      !active ||
+      !payload ||
+      payload.length === 0
+    ) {
+      return null;
+    }
+
+    const value =
+      Number(
+        payload[0]?.value
+      );
+
+    return (
+      <div className="pmip-chart-tooltip">
+
+        <p className="pmip-chart-tooltip-label">
+          {artistName || 'Artist'}
+        </p>
+
+        <p className="pmip-chart-tooltip-value">
+          {Number.isNaN(value)
+            ? 'Not available'
+            : value.toFixed(2)}
+        </p>
+
+        <span>
+          Momentum Score
+        </span>
+
+      </div>
+    );
+  }
+
+
+  // ============================================================
   // Chart
+  // ============================================================
+
   return (
-    <div>
-      <h3>Artist Momentum Score</h3>
+    <div className="intelligence-chart-card">
 
-      <p>
-        This chart shows the artist&apos;s current PMIP momentum
-        score. A higher score represents stronger momentum based
-        on the signals included in the momentum model.
-      </p>
+      <div className="intelligence-chart-header">
 
-      <div
-        style={{
-          width: '100%',
-          height: '280px'
-        }}
-      >
+        <div>
+          <p className="intelligence-chart-kicker">
+            Momentum Visualisation
+          </p>
+
+          <h3>
+            Artist Momentum Score
+          </h3>
+
+          <p className="intelligence-chart-description">
+            A higher score represents stronger momentum across
+            the signals analysed by PMIP.
+          </p>
+        </div>
+
+
+        <div className="intelligence-chart-score">
+
+          <span>
+            Score
+          </span>
+
+          <strong>
+            {numericScore.toFixed(2)}
+          </strong>
+
+          <small>
+            / 100
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div className="momentum-chart-container">
+
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -62,50 +139,84 @@ function MomentumScoreChart({
             data={chartData}
             layout="vertical"
             margin={{
-              top: 20,
-              right: 30,
-              left: 40,
-              bottom: 20
+              top: 18,
+              right: 24,
+              left: 10,
+              bottom: 10
             }}
           >
+
             <CartesianGrid
+              stroke="#334155"
               strokeDasharray="3 3"
+              horizontal={false}
             />
+
 
             <XAxis
               type="number"
               domain={[0, 100]}
-              label={{
-                value: 'Momentum Score',
-                position: 'insideBottom',
-                offset: -5
+              tick={{
+                fill: '#9CA3AF',
+                fontSize: 12
               }}
+              axisLine={{
+                stroke: '#334155'
+              }}
+              tickLine={false}
             />
+
 
             <YAxis
               type="category"
               dataKey="artist"
               width={120}
+              tick={{
+                fill: '#FFFFFF',
+                fontSize: 13
+              }}
+              axisLine={false}
+              tickLine={false}
             />
+
 
             <Tooltip
-              formatter={(value) => [
-                Number(value).toFixed(2),
-                'Momentum Score'
-              ]}
+              cursor={{
+                fill: 'rgba(124, 58, 237, 0.08)'
+              }}
+              content={<MomentumTooltip />}
             />
 
-            <Legend />
 
             <Bar
               dataKey="momentumScore"
               name="Momentum Score"
+              fill="#7C3AED"
+              radius={[0, 8, 8, 0]}
+              barSize={34}
             />
+
           </BarChart>
         </ResponsiveContainer>
+
       </div>
+
+
+      <div className="intelligence-chart-scale">
+
+        <span>
+          0 — Lower Momentum
+        </span>
+
+        <span>
+          100 — Higher Momentum
+        </span>
+
+      </div>
+
     </div>
   );
 }
+
 
 export default MomentumScoreChart;

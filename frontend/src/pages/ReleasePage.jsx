@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import PageHeader from '../components/common/PageHeader';
 import ContentSection from '../components/common/ContentSection';
+import SummaryCard from '../components/common/SummaryCard';
 
 import ReleasePerformanceChart
   from '../components/releases/ReleasePerformanceChart';
@@ -134,7 +135,6 @@ function ReleasePage() {
     }
 
     async function loadReleaseDetails() {
-      // Reset selected-release data
       setRelease(null);
       setTracks([]);
       setPerformance([]);
@@ -144,9 +144,9 @@ function ReleasePage() {
       setPerformanceLoaded(false);
 
 
-      // --------------------------------------------------------
-      // Load essential release and track data
-      // --------------------------------------------------------
+      // =========================================================
+      // Load release and tracks
+      // =========================================================
 
       try {
         setLoadingDetails(true);
@@ -180,9 +180,9 @@ function ReleasePage() {
       }
 
 
-      // --------------------------------------------------------
-      // Load optional release-performance intelligence
-      // --------------------------------------------------------
+      // =========================================================
+      // Load release-performance intelligence
+      // =========================================================
 
       try {
         setLoadingPerformance(true);
@@ -217,24 +217,35 @@ function ReleasePage() {
 
 
   // ============================================================
-  // Helpers
+  // Date formatter
   // ============================================================
 
   function formatDate(dateValue) {
     if (!dateValue) {
-      return 'Unavailable';
+      return 'Not available';
     }
 
     const date =
       new Date(dateValue);
 
     if (Number.isNaN(date.getTime())) {
-      return 'Unavailable';
+      return 'Not available';
     }
 
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }
+    );
   }
 
+
+  // ============================================================
+  // Score formatter
+  // ============================================================
 
   function formatScore(score) {
     if (
@@ -242,17 +253,34 @@ function ReleasePage() {
       score === undefined ||
       score === ''
     ) {
-      return 'Unavailable';
+      return 'Not available';
     }
 
     const parsedScore =
       Number(score);
 
     if (Number.isNaN(parsedScore)) {
-      return 'Unavailable';
+      return 'Not available';
     }
 
     return parsedScore.toFixed(2);
+  }
+
+
+  // ============================================================
+  // Review status
+  // ============================================================
+
+  function getReviewStatus(item) {
+    if (
+      !item.human_review_priority ||
+      item.human_review_priority === 'Unavailable' ||
+      item.human_review_priority === 'Not available'
+    ) {
+      return 'No review status';
+    }
+
+    return item.human_review_priority;
   }
 
 
@@ -265,7 +293,7 @@ function ReleasePage() {
 
       <PageHeader
         title="Releases"
-        description="Explore releases, related tracks and PMIP release-performance intelligence."
+        description="Explore releases, their tracks and PMIP's view of how those tracks are performing."
       />
 
 
@@ -273,10 +301,20 @@ function ReleasePage() {
           Release selection
       ======================================================== */}
 
-      <ContentSection title="Browse Releases">
+      <ContentSection
+        title="Browse Releases"
+        eyebrow="Release Explorer"
+        variant="intelligence"
+      >
+
+        <p>
+          Choose a release to see its tracks and understand how
+          PMIP evaluates their performance.
+        </p>
+
 
         {loadingReleases && (
-          <p>
+          <p className="intelligence-state-message">
             Loading releases...
           </p>
         )}
@@ -284,7 +322,7 @@ function ReleasePage() {
 
         {!loadingReleases &&
           releaseError && (
-            <p>
+            <p className="intelligence-state-message intelligence-state-error">
               {releaseError}
             </p>
           )}
@@ -293,7 +331,7 @@ function ReleasePage() {
         {!loadingReleases &&
           !releaseError &&
           releases.length === 0 && (
-            <p>
+            <p className="intelligence-state-message">
               No releases are currently available.
             </p>
           )}
@@ -302,12 +340,11 @@ function ReleasePage() {
         {!loadingReleases &&
           !releaseError &&
           releases.length > 0 && (
-            <>
-              <label htmlFor="release-select">
-                Select a release:
-              </label>
+            <div className="release-selector-card">
 
-              <br />
+              <label htmlFor="release-select">
+                Select a release
+              </label>
 
               <select
                 id="release-select"
@@ -336,7 +373,8 @@ function ReleasePage() {
                   )
                 )}
               </select>
-            </>
+
+            </div>
           )}
 
       </ContentSection>
@@ -347,8 +385,12 @@ function ReleasePage() {
       ======================================================== */}
 
       {loadingDetails && (
-        <ContentSection title="Release Details">
-          <p>
+        <ContentSection
+          title="Release Details"
+          eyebrow="Release Summary"
+          variant="intelligence"
+        >
+          <p className="intelligence-state-message">
             Loading release information...
           </p>
         </ContentSection>
@@ -361,8 +403,12 @@ function ReleasePage() {
 
       {!loadingDetails &&
         detailsError && (
-          <ContentSection title="Unable to Load Release">
-            <p>
+          <ContentSection
+            title="Unable to Load Release"
+            eyebrow="Release Summary"
+            variant="intelligence"
+          >
+            <p className="intelligence-state-message intelligence-state-error">
               {detailsError}
             </p>
           </ContentSection>
@@ -378,47 +424,75 @@ function ReleasePage() {
         release && (
           <>
 
-            {/* Release summary */}
+            {/* ==================================================
+                Release summary
+            ================================================== */}
 
-            <ContentSection title="Release Summary">
+            <ContentSection
+              title="Release Summary"
+              eyebrow="Release Profile"
+              variant="intelligence"
+            >
 
-              <p>
-                <strong>
-                  Title:
-                </strong>{' '}
-                {release.release_title}
-              </p>
+              <div className="release-summary-heading">
 
-              <p>
-                <strong>
-                  Release ID:
-                </strong>{' '}
-                {release.release_id}
-              </p>
+                <div>
+                  <p className="intelligence-result-kicker">
+                    Selected Release
+                  </p>
 
-              <p>
-                <strong>
-                  Release Date:
-                </strong>{' '}
-                {formatDate(
-                  release.release_date
-                )}
-              </p>
+                  <h3>
+                    {release.release_title}
+                  </h3>
+                </div>
 
-              <p>
-                <strong>
-                  Release Type:
-                </strong>{' '}
-                {release.release_type ||
-                  'Unavailable'}
-              </p>
 
-              <p>
-                <strong>
-                  Associated Tracks:
-                </strong>{' '}
-                {tracks.length}
-              </p>
+                <span className="release-summary-badge">
+                  {release.release_type ||
+                    'Not available'}
+                </span>
+
+              </div>
+
+
+              <div className="release-summary-grid">
+
+                <SummaryCard
+                  label="Release ID"
+                  value={
+                    release.release_id
+                  }
+                />
+
+
+                <SummaryCard
+                  label="Release Date"
+                  value={
+                    formatDate(
+                      release.release_date
+                    )
+                  }
+                />
+
+
+                <SummaryCard
+                  label="Release Type"
+                  value={
+                    release.release_type ||
+                    'Not available'
+                  }
+                />
+
+
+                <SummaryCard
+                  label="Associated Tracks"
+                  value={
+                    tracks.length
+                  }
+                  tone="highlight"
+                />
+
+              </div>
 
             </ContentSection>
 
@@ -427,39 +501,83 @@ function ReleasePage() {
                 Related tracks
             ================================================== */}
 
-            <ContentSection title="Related Tracks">
+            <ContentSection
+              title="Related Tracks"
+              eyebrow="Track Listing"
+              variant="intelligence"
+            >
+
+              <p>
+                These are the tracks connected to the selected
+                release.
+              </p>
+
 
               {tracks.length === 0 ? (
-                <p>
+                <p className="intelligence-state-message">
                   No tracks are associated with this release.
                 </p>
               ) : (
-                tracks.map((track) => (
-                  <div
-                    key={track.track_id}
-                  >
-                    <h3>
-                      {track.track_name}
-                    </h3>
+                <div className="release-track-list">
 
-                    <p>
-                      <strong>
-                        Track ID:
-                      </strong>{' '}
-                      {track.track_id}
-                    </p>
+                  {tracks.map(
+                    (track) => (
+                      <article
+                        className="release-track-card"
+                        key={track.track_id}
+                      >
 
-                    <p>
-                      <strong>
-                        ISRC:
-                      </strong>{' '}
-                      {track.isrc ||
-                        'Unavailable'}
-                    </p>
+                        <div className="release-track-card-header">
 
-                    <hr />
-                  </div>
-                ))
+                          <div>
+                            <p className="anomaly-result-kicker">
+                              Release Track
+                            </p>
+
+                            <h3>
+                              {track.track_name}
+                            </h3>
+                          </div>
+
+
+                          <span className="release-track-id-badge">
+                            Track #{track.track_id}
+                          </span>
+
+                        </div>
+
+
+                        <div className="release-track-meta-grid">
+
+                          <div className="release-track-meta-item">
+                            <span>
+                              Track ID
+                            </span>
+
+                            <strong>
+                              {track.track_id}
+                            </strong>
+                          </div>
+
+
+                          <div className="release-track-meta-item">
+                            <span>
+                              ISRC
+                            </span>
+
+                            <strong>
+                              {track.isrc ||
+                                'Not available'}
+                            </strong>
+                          </div>
+
+                        </div>
+
+                      </article>
+                    )
+                  )}
+
+                </div>
               )}
 
             </ContentSection>
@@ -469,43 +587,45 @@ function ReleasePage() {
                 Release-performance intelligence
             ================================================== */}
 
-            <ContentSection title="Release Performance Intelligence">
+            <ContentSection
+              title="Release Performance Intelligence"
+              eyebrow="Release Intelligence"
+              variant="intelligence"
+            >
 
-              {/* Loading */}
+              <p>
+                See how each track is performing within this
+                release and how much supporting data PMIP has for
+                each result.
+              </p>
+
 
               {loadingPerformance && (
-                <p>
+                <p className="intelligence-state-message">
                   Loading release-performance intelligence...
                 </p>
               )}
 
 
-              {/* API error */}
-
               {!loadingPerformance &&
                 performanceError && (
-                  <p>
-                    Release-performance intelligence is
-                    currently unavailable.{' '}
-                    {performanceError}
+                  <p className="intelligence-state-message intelligence-state-error">
+                    Release-performance intelligence is currently
+                    unavailable. {performanceError}
                   </p>
                 )}
 
-
-              {/* Empty intelligence */}
 
               {performanceLoaded &&
                 !loadingPerformance &&
                 !performanceError &&
                 performance.length === 0 && (
-                  <p>
+                  <p className="intelligence-state-message">
                     No release-performance intelligence is
                     currently available for this release.
                   </p>
                 )}
 
-
-              {/* Intelligence results */}
 
               {!loadingPerformance &&
                 !performanceError &&
@@ -518,138 +638,284 @@ function ReleasePage() {
                       }
                     />
 
-                    <br />
+
+                    <div className="release-performance-results-list">
+
+                      {performance.map(
+                        (item) => (
+                          <article
+                            className="release-performance-result-card"
+                            key={
+                              item.release_performance_id
+                            }
+                          >
+
+                            <div className="release-performance-result-header">
+
+                              <div>
+                                <p className="anomaly-result-kicker">
+                                  Track Performance
+                                </p>
+
+                                <h3>
+                                  {item.track_name ||
+                                    `Track ${item.track_id}`}
+                                </h3>
+                              </div>
 
 
-                    {performance.map((item) => (
-                      <div
-                        key={
-                          item.release_performance_id
-                        }
-                      >
-                        <h3>
-                          {item.track_name ||
-                            `Track ${item.track_id}`}
-                        </h3>
+                              <div className="release-performance-badges">
 
-                        <p>
-                          <strong>
-                            Performance Class:
-                          </strong>{' '}
-                          {
-                            item.release_performance_class ||
-                            'Unavailable'
-                          }
-                        </p>
+                                <span className="release-performance-class-badge">
+                                  {item.release_performance_class ||
+                                    'Not available'}
+                                </span>
 
-                        <p>
-                          <strong>
-                            Composite Performance Score:
-                          </strong>{' '}
-                          {formatScore(
-                            item.composite_release_performance_score
-                          )}
-                        </p>
 
-                        <p>
-                          <strong>
-                            Composite Percentile:
-                          </strong>{' '}
-                          {formatScore(
-                            item.composite_release_performance_percentile
-                          )}
-                        </p>
+                                <span className="release-priority-badge">
+                                  {item.release_priority_class ||
+                                    'Not available'}
+                                </span>
 
-                        <p>
-                          <strong>
-                            Release Rank:
-                          </strong>{' '}
-                          {
-                            item.release_rank_position ??
-                            'Unavailable'
-                          }
-                        </p>
+                              </div>
 
-                        <p>
-                          <strong>
-                            Streaming Performance Score:
-                          </strong>{' '}
-                          {formatScore(
-                            item.streaming_performance_score
-                          )}
-                        </p>
+                            </div>
 
-                        <p>
-                          <strong>
-                            Temporal Comparability Score:
-                          </strong>{' '}
-                          {formatScore(
-                            item.temporal_comparability_score
-                          )}
-                        </p>
 
-                        <p>
-                          <strong>
-                            Artist-Release Relationship Score:
-                          </strong>{' '}
-                          {formatScore(
-                            item.artist_release_relationship_score
-                          )}
-                        </p>
+                            <div className="release-performance-metric-grid">
 
-                        <p>
-                          <strong>
-                            Priority:
-                          </strong>{' '}
-                          {
-                            item.release_priority_class ||
-                            'Unavailable'
-                          }
-                        </p>
+                              <SummaryCard
+                                label="Composite Score"
+                                value={
+                                  formatScore(
+                                    item.composite_release_performance_score
+                                  )
+                                }
+                                helperText="An overall score that combines PMIP's main signals for this track's release performance."
+                                tone="highlight"
+                              />
 
-                        <p>
-                          <strong>
-                            Evidence Strength:
-                          </strong>{' '}
-                          {
-                            item.composite_evidence_strength ||
-                            'Unavailable'
-                          }
-                        </p>
 
-                        <p>
-                          <strong>
-                            Evidence Coverage:
-                          </strong>{' '}
-                          {formatScore(
-                            item.composite_weight_coverage_pct
-                          )}
-                          %
-                        </p>
+                              <SummaryCard
+                                label="Composite Percentile"
+                                value={
+                                  formatScore(
+                                    item.composite_release_performance_percentile
+                                  )
+                                }
+                                helperText="Shows how this result compares with other release-performance results. A higher percentile means a stronger relative position."
+                              />
 
-                        <p>
-                          <strong>
-                            Human Review:
-                          </strong>{' '}
-                          {
-                            item.human_review_priority ||
-                            'Unavailable'
-                          }
-                        </p>
 
-                        <p>
-                          <strong>
-                            Review Reason:
-                          </strong>{' '}
-                          {
-                            item.human_review_reason ||
-                            'No review reason provided.'
-                          }
-                        </p>
+                              <SummaryCard
+                                label="Release Rank"
+                                value={
+                                  item.release_rank_position ??
+                                  'Not available'
+                                }
+                                helperText="The track's position compared with the other tracks evaluated for release performance."
+                              />
 
-                        <hr />
-                      </div>
-                    ))}
+
+                              <SummaryCard
+                                label="Performance Class"
+                                value={
+                                  item.release_performance_class ||
+                                  'Not available'
+                                }
+                                helperText="A simple category that describes the overall strength of the track's release performance."
+                              />
+
+                            </div>
+
+
+                            <div className="release-performance-component-grid">
+
+                              <SummaryCard
+                                label="Streaming Performance"
+                                value={
+                                  formatScore(
+                                    item.streaming_performance_score
+                                  )
+                                }
+                                helperText="Shows how strongly the track is performing based on its available streaming activity."
+                              />
+
+
+                              <SummaryCard
+                                label="Temporal Comparability"
+                                value={
+                                  formatScore(
+                                    item.temporal_comparability_score
+                                  )
+                                }
+                                helperText="Shows how fairly this track can be compared with other tracks from a similar time period."
+                              />
+
+
+                              <SummaryCard
+                                label="Artist-Release Relationship"
+                                value={
+                                  formatScore(
+                                    item.artist_release_relationship_score
+                                  )
+                                }
+                                helperText="Shows how strongly the artist's available performance information supports this release result."
+                              />
+
+                            </div>
+
+
+                            <div className="release-evidence-panel">
+
+                              <div className="release-evidence-heading">
+
+                                <div>
+                                  <p className="intelligence-insight-kicker">
+                                    Evidence Quality
+                                  </p>
+
+                                  <h4>
+                                    How much information supports this result?
+                                  </h4>
+                                </div>
+
+
+                                <span className="release-evidence-badge">
+                                  {item.composite_evidence_strength ||
+                                    'Not available'}
+                                </span>
+
+                              </div>
+
+
+                              <div className="release-evidence-grid">
+
+                                <div className="release-evidence-item">
+                                  <span>
+                                    Evidence strength
+                                  </span>
+
+                                  <strong>
+                                    {item.composite_evidence_strength ||
+                                      'Not available'}
+                                  </strong>
+                                </div>
+
+
+                                <div className="release-evidence-item">
+                                  <span>
+                                    Evidence coverage
+                                  </span>
+
+                                  <strong>
+                                    {formatScore(
+                                      item.composite_weight_coverage_pct
+                                    )}%
+                                  </strong>
+                                </div>
+
+                              </div>
+
+                            </div>
+
+
+                            <div className="release-review-panel">
+
+                              <div className="release-review-header">
+
+                                <div>
+                                  <p className="intelligence-insight-kicker">
+                                    Human Review
+                                  </p>
+
+                                  <h4>
+                                    Does this result need extra attention?
+                                  </h4>
+                                </div>
+
+
+                                <span className="release-review-badge">
+                                  {getReviewStatus(item)}
+                                </span>
+
+                              </div>
+
+
+                              <p>
+                                {item.human_review_reason ||
+                                  'PMIP did not identify an additional reason for manual review.'}
+                              </p>
+
+                            </div>
+
+
+                            <div className="anomaly-interpretation">
+
+                              <p className="intelligence-insight-kicker">
+                                PMIP Interpretation
+                              </p>
+
+                              <h4>
+                                What does this mean?
+                              </h4>
+
+
+                              <p>
+                                PMIP gives{' '}
+
+                                <strong>
+                                  {item.track_name ||
+                                    `Track ${item.track_id}`}
+                                </strong>
+
+                                {' '}an overall release-performance
+                                score of{' '}
+
+                                <strong>
+                                  {formatScore(
+                                    item.composite_release_performance_score
+                                  )}
+                                </strong>
+
+                                . Its performance is classified as{' '}
+
+                                <strong>
+                                  {item.release_performance_class ||
+                                    'Not available'}
+                                </strong>
+
+                                .
+                              </p>
+
+
+                              <p>
+                                PMIP rates the supporting evidence as{' '}
+
+                                <strong>
+                                  {item.composite_evidence_strength ||
+                                    'not available'}
+                                </strong>
+
+                                , with{' '}
+
+                                <strong>
+                                  {formatScore(
+                                    item.composite_weight_coverage_pct
+                                  )}%
+                                </strong>
+
+                                {' '}of the expected evidence available
+                                for this result.
+                              </p>
+
+                            </div>
+
+                          </article>
+                        )
+                      )}
+
+                    </div>
 
                   </>
                 )}
@@ -661,29 +927,65 @@ function ReleasePage() {
                 Explanation
             ================================================== */}
 
-            <ContentSection title="How to Read This Intelligence">
+            <ContentSection
+              title="How to Read This Intelligence"
+              eyebrow="Interpretation Guide"
+              variant="intelligence"
+            >
 
-              <p>
-                PMIP evaluates each track connected to the
-                selected release rather than assuming every
-                track on the release performed in the same way.
-              </p>
+              <div className="release-guide-grid">
 
-              <p>
-                The composite release-performance score combines
-                the available performance signals into an overall
-                measurement. The performance class provides a
-                simpler description such as Low, Moderate or High
-                Release Performance.
-              </p>
+                <div className="release-guide-card">
+                  <span>
+                    Composite Score
+                  </span>
 
-              <p>
-                Evidence strength and evidence coverage are
-                important because some intelligence signals may
-                be unavailable. A human-review recommendation
-                tells the user when PMIP believes the result
-                should receive additional manual attention.
-              </p>
+                  <p>
+                    An overall measurement created by combining
+                    the main signals PMIP uses to evaluate release
+                    performance.
+                  </p>
+                </div>
+
+
+                <div className="release-guide-card">
+                  <span>
+                    Performance Class
+                  </span>
+
+                  <p>
+                    Turns the overall score into an easier category
+                    such as Low, Moderate or High Release
+                    Performance.
+                  </p>
+                </div>
+
+
+                <div className="release-guide-card">
+                  <span>
+                    Evidence Quality
+                  </span>
+
+                  <p>
+                    Shows how much reliable supporting information
+                    PMIP had when producing the result.
+                  </p>
+                </div>
+
+
+                <div className="release-guide-card">
+                  <span>
+                    Human Review
+                  </span>
+
+                  <p>
+                    Shows whether a result may need a person to
+                    look at it more closely before using it for a
+                    decision.
+                  </p>
+                </div>
+
+              </div>
 
             </ContentSection>
 

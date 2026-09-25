@@ -8,6 +8,8 @@ const releaseRoutes = require('./routes/releaseRoutes');
 const streamingRoutes = require('./routes/streamingRoutes');
 const intelligenceRoutes = require('./routes/intelligenceRoutes');
 const countryRoutes = require('./routes/countryRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 
 const app = express();
 
@@ -62,7 +64,8 @@ app.use('/api/releases', releaseRoutes);
 app.use('/api/streaming', streamingRoutes);
 app.use('/api/intelligence', intelligenceRoutes);
 app.use('/api/countries', countryRoutes);
-
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/search', searchRoutes);
 // Unknown API routes
 app.use((req, res) => {
   return res.status(404).json({
